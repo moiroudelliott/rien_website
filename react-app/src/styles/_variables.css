@@ -1,0 +1,35 @@
+/* --- src/styles/_variables.css --- */
+
+/* Définition de notre palette de couleurs */
+:root {
+  --bg-dark: #0d0c1d;
+  --bg-modal: rgba(22, 21, 45, 0.95);
+  --primary-led: #9f55ff;
+  --accent-pink: #ff3d8b;
+  --accent-blue: #00a2ff;
+  --text-main: #e8eaf6;
+  --text-secondary: #a9a9d4;
+  --border-color: rgba(159, 85, 255, 0.2);
+  --bg-primary-transparent: rgba(159, 85, 255, 0.2); /* Fond violet transparent */
+  --glow-primary: rgba(159, 85, 255, 0.6);
+  --glow-accent: rgba(255, 61, 139, 0.7);
+  --glow-blue: rgba(0, 162, 255, 0.7); /* Nouveau glow bleu */
+  --bg-blue-transparent: rgba(0, 162, 255, 0.2);
+  --success: #00ff9d;
+  --glow-success: rgba(0, 255, 157, 0.6);
+  --accent-light-pink: #FF8AD4; /* Rose clair */
+  --glow-light-pink: rgba(255, 138, 212, 0.7); /* Glow rose clair */
+  --bg-light-pink-transparent: rgba(255, 138, 212, 0.2); /* Fond rose clair transparent */
+}
+
+/* --- ANIMATIONS GLOBALES --- */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseGlow {
+  0% { box-shadow: 0 0 15px var(--glow-primary); }
+  50% { box-shadow: 0 0 30px var(--glow-primary), 0 0 10px var(--glow-primary) inset; }
+  100% { box-shadow: 0 0 15px var(--glow-primary); }
+}

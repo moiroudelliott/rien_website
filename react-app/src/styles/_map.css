@@ -1,0 +1,318 @@
+/* --- src/styles/_map.css --- */
+/* Ce fichier gère tous les styles spécifiques à la carte et ses contrôles. */
+
+/* ========================================================================== */
+/* == CONTENEURS PRINCIPAUX DE LA PAGE CARTE == */
+/* ========================================================================== */
+
+.map-page-container {
+  width: 100%;
+  height: 100vh; /* Prend toute la hauteur de la fenêtre */
+  overflow: hidden; /* Empêche tout scroll sur cette page spécifique */
+}
+
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+  background-color: var(--bg-dark);
+}
+
+/* Style de base des popups/contrôles Leaflet */
+.leaflet-control {
+  background: rgba(13, 12, 29, 0.6) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2) !important;
+}
+
+
+/* ========================================================================== */
+/* == HEADER UTILISATEUR (HAUT DROITE) == */
+/* ========================================================================== */
+
+.user-header {
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px; /* Un peu plus d'espace par défaut */
+  animation: fadeInUp 0.5s 0.2s ease-out both;
+}
+
+/* --- Style de base commun pour les BOUTONS RONDS (GPS et Poubelle) --- */
+.user-header .action-button {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid transparent; /* Bordure transparente par défaut */
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  box-sizing: border-box; /* Ajout pour une taille cohérente */
+}
+
+/* --- Style spécifique pour chaque bouton --- */
+.user-header .geolocate-button {
+  background-color: var(--bg-primary-transparent);
+  border-color: var(--primary-led);
+}
+.user-header .delete-location-button {
+  background-color: rgba(255, 61, 139, 0.2);
+  border-color: var(--accent-pink);
+}
+
+/* --- Style pour l'AVATAR --- */
+.user-header .user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid var(--accent-blue); /* Changé pour le bleu */
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  overflow: hidden; /* Important pour que l'image soit bien ronde */
+  box-sizing: border-box; /* Ajout pour une taille cohérente */
+  background-color: var(--bg-blue-transparent); /* Ajout d'un fond cohérent */
+}
+.user-header .user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* --- Effet de survol --- */
+.user-header .action-button:hover,
+.user-header .user-avatar:hover,
+.user-header .logout-button:hover {
+    transform: scale(1.1);
+}
+.user-header .geolocate-button:hover { box-shadow: 0 0 15px var(--glow-primary); }
+.user-header .delete-location-button:hover { box-shadow: 0 0 15px var(--glow-accent); }
+.user-header .user-avatar:hover { box-shadow: 0 0 15px var(--glow-blue); }
+
+
+/* Le pseudo */
+.user-header .user-name {
+  font-weight: 600;
+  color: #fff;
+}
+
+/* --- BOUTON DE DÉCONNEXION (RECTANGULAIRE PAR DÉFAUT) --- */
+.user-header .logout-button {
+  background: #333;
+  color: var(--text-secondary);
+  border: 2px solid #555; /* On ajoute une bordure discrète */
+  width: auto;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.user-header .logout-button:hover {
+  background: var(--accent-pink);
+  border-color: var(--accent-pink);
+  color: white;
+  box-shadow: 0 0 15px var(--glow-accent);
+}
+
+
+/* ========================================================================== */
+/* == BANNIÈRE DE SAUVEGARDE DE POSITION (BAS CENTRE) == */
+/* ========================================================================== */
+
+.leaflet-bottom.leaflet-center {
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  padding-bottom: 25px;
+}
+
+.save-location-banner {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  text-align: center;
+  padding: 12px 20px;
+}
+
+.position-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.position-title {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+.position-coords {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--text-main);
+  white-space: nowrap;
+}
+
+.save-location-banner .button-group {
+    display: flex;
+    gap: 10px;
+}
+
+.save-location-banner .save-button,
+.save-location-banner .cancel-button {
+  border: none;
+  font-weight: bold;
+  border-radius: 8px;
+  padding: 12px 22px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 1rem;
+}
+.save-location-banner .save-button {
+  background-color: var(--success);
+  color: var(--bg-dark);
+  box-shadow: 0 0 10px var(--glow-success);
+}
+.save-location-banner .save-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px var(--glow-success);
+}
+.save-location-banner .cancel-button {
+  background-color: transparent;
+  border: 1px solid var(--text-secondary);
+  color: var(--text-secondary);
+}
+.save-location-banner .cancel-button:hover {
+  background-color: var(--text-secondary);
+  color: var(--bg-dark);
+}
+
+
+/* ========================================================================== */
+/* == MARQUEURS SUR LA CARTE == */
+/* ========================================================================== */
+/* Aucune modification ici, c'était déjà bon */
+.discord-avatar-marker {
+  position: relative;
+  width: 60px; height: 80px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+.discord-avatar-marker:hover {
+  transform: translateY(-5px);
+  z-index: 9999 !important;
+}
+.avatar-container {
+  position: absolute;
+  top: 12px; left: 50%;
+  transform: translateX(-50%);
+  width: 54px; height: 54px;
+  border-radius: 50%;
+  border: 3px solid var(--primary-led);
+  background-color: var(--primary-led);
+  box-shadow: 0 0 15px var(--glow-primary);
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index: 10;
+}
+.avatar-container:hover {
+  transform: translateX(-50%) scale(1.1);
+  box-shadow: 0 0 25px var(--glow-primary);
+}
+.discord-avatar-marker img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.marker-arrow {
+  position: absolute;
+  bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 0; height: 0; 
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 12px solid var(--primary-led);
+  filter: drop-shadow(0 -3px 5px var(--glow-primary));
+  z-index: 5;
+}
+.marker-username-label {
+  position: absolute;
+  top: 0; left: 50%;
+  background: var(--primary-led);
+  color: white;
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  opacity: 0;
+  transform: translate(-50%, 10px);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  pointer-events: none;
+  z-index: 100;
+}
+.discord-avatar-marker:hover .marker-username-label {
+  opacity: 1;
+  transform: translate(-50%, -5px);
+}
+
+
+/* ========================================================================== */
+/* == RESPONSIVE SPÉCIFIQUE À LA CARTE == */
+/* ========================================================================== */
+
+
+@media (max-width: 500px) {
+  /* --- On réorganise le header utilisateur en colonne --- */
+  .user-header {
+    flex-direction: column; /* Passe en colonne */
+    align-items: flex-end;  /* Aligne tout à droite */
+    gap: 8px;
+  }
+
+  /* --- On cache le nom d'utilisateur --- */
+  .user-header .user-name {
+    display: none;
+  }
+  
+  /* --- On transforme le bouton de déconnexion en icône ronde --- */
+  .user-header .logout-button {
+    /* Dimensions et forme */
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    padding: 0;
+    box-sizing: border-box; /* Ajout pour une taille cohérente */
+
+    /* On change la bordure pour qu'elle corresponde aux autres */
+    border-color: var(--accent-light-pink);
+    background-color: var(--bg-light-pink-transparent);
+
+    /* On cache le texte et on met le SVG */
+    font-size: 0;
+    color: transparent;
+    background-image: url('/power.svg');
+    background-size: 20px 20px;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+  .user-header .logout-button:hover {
+    box-shadow: 0 0 15px var(--glow-light-pink);
+  }
+}
+
+@media (max-width: 500px) {
+  
+  /* On raccourcit le texte du bouton de sauvegarde */
+  .save-location-banner .save-button {
+      padding: 12px 18px; /* On réduit un peu le padding */
+  }
+}

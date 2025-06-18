@@ -1,0 +1,54 @@
+/* --- src/styles/_auth.css --- */
+
+.loading-screen, .login-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  animation: fadeInUp 0.8s ease-out;
+  text-align: center;
+  padding: 0 20px;
+}
+
+.login-container h1 {
+  font-size: clamp(2.5rem, 8vw, 4rem); /* Responsive font size */
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #fff;
+  text-shadow: 0 0 10px var(--glow-primary), 0 0 20px var(--glow-primary);
+}
+
+.login-container p {
+  font-size: clamp(1rem, 3vw, 1.2rem);
+  color: var(--text-secondary);
+  margin-bottom: 3rem;
+}
+
+.discord-login-button {
+  background: var(--primary-led);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 18px 35px;
+  font-size: 1.3rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 15px var(--glow-primary);
+  animation: pulseGlow 3s infinite ease-in-out;
+}
+
+.discord-login-button:hover {
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 0 0 35px var(--glow-primary);
+  animation-play-state: paused;
+}
+
+.discord-login-button img {
+  width: 30px;
+  height: 30px;
+}

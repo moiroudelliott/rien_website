@@ -1,0 +1,46 @@
+/* --- src/styles/_base.css --- */
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  /* On retire overflow: hidden; pour autoriser le scroll global si besoin */
+}
+
+.app-container {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  /* On ajoute le overflow ici pour gérer le scroll au niveau de l'app */
+  overflow: auto; 
+}
+
+::-webkit-scrollbar {
+  width: 10px; /* Largeur de la scrollbar */
+}
+
+/* Le fond de la barre (la "piste") */
+::-webkit-scrollbar-track {
+  background: var(--bg-dark); /* Fond assorti à l'arrière-plan */
+  border-radius: 5px;
+}
+ 
+/* La partie déplaçable (le "pouce") */
+::-webkit-scrollbar-thumb {
+  background: var(--primary-led); /* Couleur principale du thème */
+  border-radius: 5px;
+  border: 2px solid var(--bg-dark); /* Crée un effet de bordure flottante */
+}
+
+/* Le pouce au survol */
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-pink); /* Change de couleur au survol */
+}
+
+/* Pour Firefox (un peu plus limité mais fonctionnel) */
+/* La syntaxe est différente et moins flexible */
+* {
+  scrollbar-width: thin; /* Options: 'auto', 'thin', 'none' */
+  scrollbar-color: var(--primary-led) var(--bg-dark); /* Couleur du pouce et de la piste */
+}

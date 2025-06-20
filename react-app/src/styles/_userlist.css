@@ -1,0 +1,92 @@
+/* Styles pour la page des utilisateurs et potentiellement d'autres pages listes */
+.theme-users {
+    --primary-led: var(--led-blue);
+    --glow-primary: var(--glow-blue);
+    --bg-primary-transparent: var(--bg-blue-transparent);
+    background: radial-gradient(ellipse at center top, var(--bg-blue-transparent) 0%, var(--bg-dark) 70%);
+}
+
+.theme-users .navbar {
+    border-bottom-color: var(--led-blue);
+}
+
+.page-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.page-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  color: var(--text-main);
+  text-align: center;
+  text-shadow: 0 0 10px var(--glow-primary);
+}
+
+.users-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.user-card-list {
+  background-color: var(--bg-primary-transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  border: 1px solid var(--border-color);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  animation: fadeInUp 0.5s ease-out forwards;
+  opacity: 0; /* Démarre invisible pour l'animation */
+}
+
+.user-card-list:hover {
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: 0 0 25px var(--glow-primary), 0 0 10px var(--glow-accent);
+  border-color: var(--primary-led);
+}
+
+.user-card-list .user-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin-bottom: 1rem;
+  border: 3px solid var(--primary-led);
+  box-shadow: 0 0 15px var(--glow-primary);
+  transition: all 0.3s ease;
+  animation: pulseGlow 2.5s infinite ease-in-out;
+}
+
+.user-card-list:hover .user-avatar {
+  transform: scale(1.1);
+  box-shadow: 0 0 35px var(--glow-accent);
+  border-color: var(--accent-pink);
+  animation-play-state: paused;
+}
+
+.user-card-list .user-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-card-list .user-name {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 0.25rem;
+}
+
+.user-card-list .user-username {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-style: italic;
+} 

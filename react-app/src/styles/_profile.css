@@ -224,6 +224,79 @@
   color: var(--bg-dark);
 }
 
+/* --- NOUVEAU : Section film préféré --- */
+.favorite-movie-section {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #4f545c;
+}
+
+.favorite-movie-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 10px;
+}
+
+.favorite-movie-header h4 {
+  margin: 0;
+}
+
+.view-all-movies-link {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  cursor: pointer;
+  font-size: 0.9em;
+  text-decoration: none;
+  padding: 5px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.view-all-movies-link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  text-decoration: underline;
+}
+
+.favorite-movie-section h4 {
+  color: #ffffff;
+  margin-bottom: 15px;
+  text-align: left;
+}
+
+.favorite-movie-content {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: rgba(0,0,0,0.2);
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.favorite-movie-content p {
+    margin: 0;
+}
+
+.fav-movie-poster {
+  width: 60px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 4px;
+  flex-shrink: 0; /* Empêche l'image de se déformer */
+}
+
+.fav-movie-details h5 {
+  margin: 0 0 5px 0;
+  font-size: 1.1rem;
+  color: var(--text-main);
+}
+
+.fav-movie-details p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
 /* --- Mode Édition dans la modale --- */
 .form-title {
   text-align: center;

@@ -2,11 +2,18 @@
 
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
-// Importe tes autres composants
-import MapComponent from './components/MapComponent';
+// Import des pages
+import Home from './pages/Home';
+import MapPage from './pages/MapPage';
+import UserList from './pages/UserList';
+import CinemaHome from './pages/CinemaHome';
+
+// Import des composants
 import ProfileCompletion from './components/ProfileCompletion';
 import ConfettiRain from './components/ConfettiRain';
+import Navbar from './components/Navbar';
 import { useKonamiCode } from './useKonamiCode';
 
 import './styles/App.css';
@@ -18,6 +25,8 @@ function App() {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isKonamiActive, setIsKonamiActive] = useState(false);
+  const [theme, setTheme] = useState('theme-map'); // Thème par défaut
+  const location = useLocation();
 
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
@@ -51,6 +60,19 @@ function App() {
     checkUserSession();
   }, []);
 
+  useEffect(() => {
+    const path = location.pathname;
+    if (path.includes('/cinema')) {
+      setTheme('theme-cinema');
+    } else if (path.includes('/users')) {
+      setTheme('theme-users');
+    } else if (path.includes('/home')) {
+        setTheme('theme-home');
+    } else {
+      setTheme('theme-map'); // Thème par défaut pour la carte et le reste
+    }
+  }, [location]);
+
   const handleLogin = () => {
     window.location.href = `${apiBaseUrl}/login.php`;
   };
@@ -58,64 +80,70 @@ function App() {
   const handleLogout = () => {
     axios.post(`${apiBaseUrl}/logout.php`)
       .then(() => {
-        // Après une déconnexion réussie, on remet l'état à null
         setCurrentUser(null);
       })
       .catch(error => {
         console.error("Erreur lors de la déconnexion:", error);
-        // Même si la déconnexion échoue, on force l'état local à null
         setCurrentUser(null);
       });
   };
   
   // Fonction appelée quand le profil est mis à jour
   const handleProfileComplete = (updatedUserData) => {
-    // Met à jour l'utilisateur courant avec les nouvelles données
-    // et s'assure que le flag profile_complete est bien à true
     setCurrentUser({ ...currentUser, ...updatedUserData, profile_complete: true });
   }
 
   // --- Le rendu ---
 
   if (loading) {
-    return <div className="loading-screen">Chargement...</div>;
+    return <div className="loading-screen"><div className="spinner"></div></div>;
   }
 
-  // Si on n'est pas en chargement, on affiche le bon écran
-  return (
-    <div className="app-container">
-      {isKonamiActive && <ConfettiRain />}
-
-      {/* CAS 1 : Utilisateur non connecté */}
-      {!currentUser && (
+  // CAS 1 : Utilisateur non connecté -> Affiche la page de connexion
+  if (!currentUser) {
+    return (
+      <div className="app-container">
         <div className="login-container">
-          <h1>Rien World Map</h1>
-          <p>Placez votre avatar sur la carte du monde !</p>
+          <h1>rien app</h1>
+          <p>Connectez-vous pour accéder aux différentes fonctionnalités.</p>
           <button onClick={handleLogin} className="discord-login-button">
             <img src="/discord-logo.svg" alt="Discord Logo" />
             Se connecter avec Discord
           </button>
         </div>
-      )}
+      </div>
+    );
+  }
 
-      {/* CAS 2 : Utilisateur connecté mais profil incomplet */}
-      {currentUser && !currentUser.profile_complete && (
+  // CAS 2 : Utilisateur connecté mais profil incomplet -> Affiche le formulaire de complétion
+  if (!currentUser.profile_complete) {
+    return (
         <ProfileCompletion 
           currentUser={currentUser}
           onProfileComplete={handleProfileComplete} 
         />
-      )}
+    );
+  }
 
-      {/* CAS 3 : Utilisateur connecté ET profil complet */}
-      {currentUser && currentUser.profile_complete && (
-      <div className="map-page-container"> {/* On ajoute ce conteneur */}
-        <MapComponent
-          currentUser={currentUser}
-          onLogout={handleLogout}
-          onProfileUpdated={handleProfileUpdated}
-        />
-      </div>
-    )}
+  // CAS 3 : Utilisateur connecté ET profil complet -> Affiche l'application principale avec la navigation
+  return (
+    <div className={`app-container main-app-layout ${theme}`}>
+      {isKonamiActive && <ConfettiRain />}
+      <Navbar onLogout={handleLogout} />
+      <main className="main-content">
+        <Routes>
+          <Route path="/" element={<Navigate to="/home" replace />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/cinema" element={<CinemaHome user={currentUser} />} />
+          <Route path="/users" element={<UserList />} />
+          <Route 
+            path="/map" 
+            element={<MapPage currentUser={currentUser} onProfileUpdated={handleProfileUpdated} />} 
+          />
+          {/* Redirige toutes les autres routes non trouvées vers l'accueil */}
+          <Route path="*" element={<Navigate to="/home" replace />} />
+        </Routes>
+      </main>
     </div>
   );
 }

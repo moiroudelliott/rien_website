@@ -1,19 +1,29 @@
 /* --- src/styles/_map.css --- */
 /* Ce fichier gère tous les styles spécifiques à la carte et ses contrôles. */
 
+.theme-map {
+    background: radial-gradient(ellipse at center top, var(--bg-primary-transparent) 0%, var(--bg-dark) 70%);
+}
+
 /* ========================================================================== */
 /* == CONTENEURS PRINCIPAUX DE LA PAGE CARTE == */
 /* ========================================================================== */
 
 .map-page-container {
   width: 100%;
-  height: 100vh; /* Prend toute la hauteur de la fenêtre */
+  height: 100%; /* Prend toute la hauteur de l'élément .main-content */
   overflow: hidden; /* Empêche tout scroll sur cette page spécifique */
 }
 
+.map-wrapper {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
 .leaflet-container {
-  height: 100%;
   width: 100%;
+  height: 100%;
   background-color: var(--bg-dark);
 }
 
@@ -26,6 +36,36 @@
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2) !important;
 }
 
+/* Style for zoom controls */
+.leaflet-control-zoom {
+    border: none !important;
+    margin-top: 10px !important; /* Espace par rapport au header */
+    box-shadow: none !important;
+}
+
+.leaflet-control-zoom a {
+    width: 40px !important;
+    height: 40px !important;
+    line-height: 40px !important;
+    background: rgba(13, 12, 29, 0.6) !important;
+    backdrop-filter: blur(12px) !important;
+    border: 1px solid var(--border-color) !important;
+    color: white !important;
+    transition: all 0.2s ease;
+}
+
+.leaflet-control-zoom a:hover {
+    background: var(--bg-hover) !important;
+}
+
+.leaflet-control-zoom-in {
+    border-radius: 12px 12px 0 0 !important;
+}
+
+.leaflet-control-zoom-out {
+    border-radius: 0 0 12px 12px !important;
+    border-top: none !important;
+}
 
 /* ========================================================================== */
 /* == HEADER UTILISATEUR (HAUT DROITE) == */
@@ -52,6 +92,11 @@
   align-items: center;
   padding: 0;
   box-sizing: border-box; /* Ajout pour une taille cohérente */
+}
+
+.user-header .action-button img {
+    width: 22px;
+    height: 22px;
 }
 
 /* --- Style spécifique pour chaque bouton --- */
@@ -128,7 +173,7 @@
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 1000;
+  z-index: 999;
   padding-bottom: 25px;
 }
 

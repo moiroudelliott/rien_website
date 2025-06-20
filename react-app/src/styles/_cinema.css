@@ -1,0 +1,114 @@
+/* Styles pour la section cinéma */
+.activity-feed {
+    width: 100%;
+}
+
+.activity-feed h3 {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.compact-activity-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.compact-activity-item {
+    font-size: 0.9rem;
+    color: var(--text-main);
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--bg-surface);
+    opacity: 0;
+    animation: slideInFromLeft 0.5s ease-out forwards;
+}
+
+.compact-activity-item:nth-child(2) { animation-delay: 0.1s; }
+.compact-activity-item:nth-child(3) { animation-delay: 0.2s; }
+.compact-activity-item:nth-child(4) { animation-delay: 0.3s; }
+.compact-activity-item:nth-child(5) { animation-delay: 0.4s; }
+.compact-activity-item:nth-child(6) { animation-delay: 0.5s; }
+.compact-activity-item:nth-child(7) { animation-delay: 0.6s; }
+.compact-activity-item:nth-child(8) { animation-delay: 0.7s; }
+
+.compact-activity-item:last-child {
+    border-bottom: none;
+}
+
+.username-link, .movie-title-link {
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.username-link {
+    color: var(--text-main);
+}
+.username-link:hover {
+    color: var(--primary-led);
+}
+
+.movie-title-link {
+    color: var(--primary-led);
+}
+.movie-title-link:hover {
+    text-decoration: underline;
+    filter: brightness(1.2);
+}
+
+.activity-rating {
+    margin-left: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.activity-feed-container {
+    margin-top: 2rem;
+}
+
+.section-title {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-color);
+}
+
+.cinema-content {
+    display: flex;
+    flex-direction: column; /* Toujours en colonne */
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.user-movies-section {
+    width: 100%; /* Prend toute la largeur */
+}
+
+.activity-feed {
+    width: 100%; /* Prend toute la largeur */
+    background-color: rgba(0,0,0,0.2);
+    padding: 1.5rem;
+    border-radius: 8px;
+}
+
+@media (max-width: 768px) {
+    .cinema-content {
+        /* Plus besoin de rien ici, c'est déjà en colonne */
+    }
+    .activity-feed {
+        padding: 1rem;
+    }
+}
+
+.theme-cinema {
+    --primary-led: var(--led-red);
+    --glow-primary: var(--glow-red);
+    --bg-primary-transparent: var(--bg-red-transparent);
+    background: radial-gradient(ellipse at center top, var(--bg-red-transparent) 0%, var(--bg-dark) 70%);
+} 

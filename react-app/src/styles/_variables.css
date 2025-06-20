@@ -4,17 +4,32 @@
 :root {
   --bg-dark: #0d0c1d;
   --bg-modal: rgba(22, 21, 45, 0.95);
+  
+  /* Palette Violet (par défaut, pour la carte) */
   --primary-led: #9f55ff;
+  --glow-primary: rgba(159, 85, 255, 0.6);
+  --bg-primary-transparent: rgba(159, 85, 255, 0.2);
+
+  /* Palette Rouge (pour le cinéma) */
+  --led-red: #ff3333;
+  --glow-red: rgba(255, 51, 51, 0.7);
+  --bg-red-transparent: rgba(255, 51, 51, 0.2);
+
+  /* Palette Bleu (pour les utilisateurs) */
+  --led-blue: #00a2ff;
+  --glow-blue: rgba(0, 162, 255, 0.7);
+  --bg-blue-transparent: rgba(0, 162, 255, 0.2);
+
+  /* Palette Blanche (pour l'accueil) */
+  --led-white: #ffffff;
+  --glow-white: rgba(255, 255, 255, 0.7);
+  --bg-white-transparent: rgba(255, 255, 255, 0.2);
+
   --accent-pink: #ff3d8b;
-  --accent-blue: #00a2ff;
+  --glow-accent: rgba(255, 61, 139, 0.7);
   --text-main: #e8eaf6;
   --text-secondary: #a9a9d4;
   --border-color: rgba(159, 85, 255, 0.2);
-  --bg-primary-transparent: rgba(159, 85, 255, 0.2); /* Fond violet transparent */
-  --glow-primary: rgba(159, 85, 255, 0.6);
-  --glow-accent: rgba(255, 61, 139, 0.7);
-  --glow-blue: rgba(0, 162, 255, 0.7); /* Nouveau glow bleu */
-  --bg-blue-transparent: rgba(0, 162, 255, 0.2);
   --success: #00ff9d;
   --glow-success: rgba(0, 255, 157, 0.6);
   --accent-light-pink: #FF8AD4; /* Rose clair */
@@ -32,4 +47,38 @@
   0% { box-shadow: 0 0 15px var(--glow-primary); }
   50% { box-shadow: 0 0 30px var(--glow-primary), 0 0 10px var(--glow-primary) inset; }
   100% { box-shadow: 0 0 15px var(--glow-primary); }
+}
+
+@keyframes neonFlicker {
+  0%, 18%, 22%, 25%, 53%, 57%, 100% {
+    text-shadow:
+      0 0 4px var(--primary-led),
+      0 0 10px var(--primary-led),
+      0 0 20px var(--primary-led),
+      0 0 40px var(--glow-primary),
+      0 0 80px var(--glow-primary);
+  }
+  20%, 24%, 55% {
+    text-shadow: none;
+  }
+}
+
+@keyframes backgroundShine {
+  from {
+    transform: translateX(-110%);
+  }
+  to {
+    transform: translateX(110%);
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }

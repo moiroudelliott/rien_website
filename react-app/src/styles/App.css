@@ -4,3 +4,12 @@
 @import url('./_map.css');
 @import url('./_profile.css');
 @import url('./_confetti.css');
+
+/* Nouveaux styles */
+@import url('./_home.css');
+@import url('./_navbar.css');
+@import url('./_userlist.css');
+@import url('./_cinema.css');
+@import url('./_moviesearch.css');
+@import url('./_ratingmodal.css');
+@import url('./_moviedetailmodal.css');

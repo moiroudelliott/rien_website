@@ -1,5 +1,5 @@
 .leaflet-container {
   width: 100%;
-  height: 100vh; /* La carte prendra toute la hauteur de la vue */
+  height: 100%; /* La carte prendra toute la hauteur de son conteneur parent */
 }
 

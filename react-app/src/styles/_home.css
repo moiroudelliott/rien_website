@@ -1,0 +1,81 @@
+.theme-home {
+    --primary-led: var(--led-white);
+    --glow-primary: var(--glow-white);
+    --bg-primary-transparent: var(--bg-white-transparent);
+    background: radial-gradient(ellipse at center top, var(--bg-white-transparent) 0%, var(--bg-dark) 70%);
+}
+
+.home-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+  text-align: center;
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+.home-title {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.home-subtitle {
+  font-size: 1.25rem;
+  margin-bottom: 3rem;
+  color: var(--text-secondary-color);
+}
+
+.apps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  width: 100%;
+  max-width: 1000px;
+}
+
+.app-card {
+  background-color: var(--card-background-color);
+  border-radius: 12px;
+  padding: 2rem;
+  text-decoration: none;
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.app-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 0 25px var(--glow-primary);
+  border-color: var(--primary-led);
+}
+
+.app-icon {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 1.5rem;
+}
+
+.app-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.app-description {
+  font-size: 1rem;
+  color: var(--text-secondary-color);
+  line-height: 1.5;
+}
+
+/* Correction pour le bouton de déconnexion sur le thème home */
+.theme-home .logout-button:hover {
+  color: var(--bg-dark); /* Texte foncé pour le contraste sur fond blanc */
+} 

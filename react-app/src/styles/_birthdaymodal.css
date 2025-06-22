@@ -1,0 +1,127 @@
+.birthday-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000; /* Assurez-vous qu'il est au-dessus de tout le reste */
+}
+
+.birthday-modal-content {
+    background: linear-gradient(145deg, var(--bg-modal), #2a2850);
+    padding: 2.5rem;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 600px;
+    border: 1px solid var(--accent-light-pink);
+    box-shadow: 0 0 40px var(--glow-light-pink);
+    position: relative;
+    animation: fadeInUp 0.5s ease-out, pulseGlow 3s infinite ease-in-out;
+    text-align: center;
+}
+
+.birthday-modal-content .close-button {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 2rem;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.birthday-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.birthday-header h1 {
+    font-size: 2.5rem;
+    color: #fff;
+    text-shadow: 0 0 10px var(--glow-accent), 0 0 20px var(--glow-accent);
+    margin: 0 1rem;
+    animation: neonFlicker 3s infinite alternate;
+    white-space: nowrap; /* Empêche le retour à la ligne */
+}
+
+.header-confetti {
+    width: 50px;
+    animation: spin 3s linear infinite;
+}
+
+.birthday-users-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1.5rem;
+}
+
+.birthday-user-card {
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 1rem;
+    border-radius: 12px;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+.birthday-user-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.birthday-user-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 3px solid var(--accent-pink);
+    margin-bottom: 1rem;
+}
+
+.birthday-user-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-main);
+    margin: 0;
+}
+
+.birthday-user-username {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin: 0.25rem 0 0 0;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@media (max-width: 600px) {
+    .birthday-modal-content {
+        padding: 2.5rem 1.5rem;
+    }
+
+    .birthday-header h1 {
+        font-size: 1.9rem;
+        margin: 0 0.5rem;
+    }
+
+    .header-confetti {
+        width: 35px;
+    }
+
+    .birthday-users-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 1rem;
+    }
+
+    .birthday-user-avatar {
+        width: 80px;
+        height: 80px;
+    }
+} 

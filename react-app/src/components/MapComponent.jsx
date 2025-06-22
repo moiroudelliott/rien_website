@@ -42,7 +42,7 @@ const HeaderControl = ({ currentUser, onProfileClick, onGeolocate, onDeleteLocat
                 <button onClick={onDeleteLocation} className="action-button delete-location-button" title="Supprimer ma position">
                     <img src="/delete.svg" alt="Supprimer" />
                 </button>
-                <button onClick={onProfileClick} className="user-avatar" title="Mon Profil">
+                <button onClick={onProfileClick} className="action-button profile-button" title="Mon Profil">
                     <img src={getAvatarUrl(currentUser, 64)} alt="Mon Profil"/>
                 </button>
             </div>

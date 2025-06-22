@@ -10,7 +10,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1002; /* Augmenté pour être au-dessus de tout */
+    z-index: 1030; /* Augmenté pour être au-dessus de tout */
 }
 
 .user-movies-modal-backdrop {
@@ -24,7 +24,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1200; /* Assure que la modale est au-dessus de la nav */
+    z-index: 1000; /* Assure que la modale est au-dessus de la nav */
     opacity: 0;
     animation: fadeIn 0.3s forwards;
 }

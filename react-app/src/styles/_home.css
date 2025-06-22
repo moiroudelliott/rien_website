@@ -30,8 +30,9 @@
 }
 
 .apps-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 2rem;
   width: 100%;
   max-width: 1000px;
@@ -49,12 +50,11 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  flex-basis: 280px;
 }
 
 .app-card:hover {
   transform: translateY(-8px) scale(1.02);
-  box-shadow: 0 0 25px var(--glow-primary);
-  border-color: var(--primary-led);
 }
 
 .app-icon {
@@ -73,6 +73,27 @@
   font-size: 1rem;
   color: var(--text-secondary-color);
   line-height: 1.5;
+}
+
+/* Hover effects for specific app cards */
+.app-card-cinema:hover {
+  box-shadow: 0 0 25px var(--glow-red);
+  border-color: var(--led-red);
+}
+
+.app-card-users:hover {
+  box-shadow: 0 0 25px var(--glow-blue);
+  border-color: var(--led-blue);
+}
+
+.app-card-map:hover {
+  box-shadow: 0 0 25px var(--glow-violet);
+  border-color: var(--led-violet);
+}
+
+.app-card-events:hover {
+  box-shadow: 0 0 25px var(--glow-pink);
+  border-color: var(--led-pink);
 }
 
 /* Correction pour le bouton de déconnexion sur le thème home */

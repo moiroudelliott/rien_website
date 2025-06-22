@@ -7,10 +7,11 @@ header("Content-Type: application/json; charset=UTF-8");
 
 $pdo = getDBConnection();
 
-// On sélectionne maintenant les colonnes utiles pour la CARTE ET les profils,
-// et on s'assure de ne prendre que les utilisateurs qui ont des coordonnées.
-$stmt = $pdo->query("
+// On récupère les utilisateurs qui ont un profil complet.
+// On inclut maintenant l'ID interne pour les invitations.
+$query = "
     SELECT 
+        id, -- Ajout de l'ID interne
         discord_id, 
         username, 
         avatar_hash, 
@@ -19,9 +20,29 @@ $stmt = $pdo->query("
         latitude,
         longitude
     FROM users 
-    WHERE profile_complete = TRUE AND latitude IS NOT NULL AND longitude IS NOT NULL
+    WHERE profile_complete = TRUE
     ORDER BY username
-");
+";
+
+// Si le paramètre 'with_location' est présent, on ne retourne que les utilisateurs localisés.
+if (isset($_GET['with_location']) && $_GET['with_location'] === 'true') {
+    $query = "
+        SELECT 
+            id, 
+            discord_id, 
+            username, 
+            avatar_hash, 
+            first_name, 
+            last_name,
+            latitude,
+            longitude
+        FROM users 
+        WHERE profile_complete = TRUE AND latitude IS NOT NULL AND longitude IS NOT NULL
+        ORDER BY username
+    ";
+}
+
+$stmt = $pdo->query($query);
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 echo json_encode($users);

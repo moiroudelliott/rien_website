@@ -9,12 +9,14 @@ import Home from './pages/Home';
 import MapPage from './pages/MapPage';
 import UserList from './pages/UserList';
 import CinemaHome from './pages/CinemaHome';
+import EventsPage from './pages/EventsPage';
 
 // Import des composants
 import ProfileCompletion from './components/ProfileCompletion';
 import ConfettiRain from './components/ConfettiRain';
 import Navbar from './components/Navbar';
 import { useKonamiCode } from './useKonamiCode';
+import BirthdayModal from './components/BirthdayModal';
 
 import './styles/App.css';
 
@@ -25,6 +27,7 @@ function App() {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isKonamiActive, setIsKonamiActive] = useState(false);
+  const [birthdayUsers, setBirthdayUsers] = useState([]);
   const [theme, setTheme] = useState('theme-map'); // Thème par défaut
   const location = useLocation();
 
@@ -58,6 +61,18 @@ function App() {
   // Au premier chargement de l'application, on vérifie la session
   useEffect(() => {
     checkUserSession();
+
+    // Vérifier les anniversaires au chargement de l'app
+    axios.get(`${apiBaseUrl}/get_todays_birthdays.php`)
+      .then(response => {
+        if (response.data && response.data.length > 0) {
+          setBirthdayUsers(response.data);
+        }
+      })
+      .catch(error => {
+        console.error("Erreur lors de la récupération des anniversaires:", error);
+      });
+
   }, []);
 
   useEffect(() => {
@@ -66,6 +81,8 @@ function App() {
       setTheme('theme-cinema');
     } else if (path.includes('/users')) {
       setTheme('theme-users');
+    } else if (path.includes('/events')) {
+      setTheme('theme-events');
     } else if (path.includes('/home')) {
         setTheme('theme-home');
     } else {
@@ -129,6 +146,12 @@ function App() {
   return (
     <div className={`app-container main-app-layout ${theme}`}>
       {isKonamiActive && <ConfettiRain />}
+      {birthdayUsers.length > 0 && 
+        <BirthdayModal 
+            users={birthdayUsers} 
+            onClose={() => setBirthdayUsers([])} 
+        />
+      }
       <Navbar onLogout={handleLogout} />
       <main className="main-content">
         <Routes>
@@ -136,6 +159,7 @@ function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/cinema" element={<CinemaHome user={currentUser} />} />
           <Route path="/users" element={<UserList />} />
+          <Route path="/events" element={<EventsPage currentUser={currentUser} />} />
           <Route 
             path="/map" 
             element={<MapPage currentUser={currentUser} onProfileUpdated={handleProfileUpdated} />} 

@@ -5,10 +5,15 @@
   --bg-dark: #0d0c1d;
   --bg-modal: rgba(22, 21, 45, 0.95);
   
-  /* Palette Violet (par défaut, pour la carte) */
-  --primary-led: #9f55ff;
-  --glow-primary: rgba(159, 85, 255, 0.6);
-  --bg-primary-transparent: rgba(159, 85, 255, 0.2);
+  /* Palette Violet (pour la carte) */
+  --led-violet: #9f55ff;
+  --glow-violet: rgba(159, 85, 255, 0.6);
+  --bg-violet-transparent: rgba(159, 85, 255, 0.2);
+  
+  /* Palette Primaire (thème par défaut) */
+  --primary-led: var(--led-violet);
+  --glow-primary: var(--glow-violet);
+  --bg-primary-transparent: var(--bg-violet-transparent);
 
   /* Palette Rouge (pour le cinéma) */
   --led-red: #ff3333;
@@ -16,9 +21,14 @@
   --bg-red-transparent: rgba(255, 51, 51, 0.2);
 
   /* Palette Bleu (pour les utilisateurs) */
-  --led-blue: #00a2ff;
-  --glow-blue: rgba(0, 162, 255, 0.7);
-  --bg-blue-transparent: rgba(0, 162, 255, 0.2);
+  --led-blue: #00e5ff;
+  --glow-blue: rgba(0, 229, 255, 0.7);
+  --bg-blue-transparent: rgba(0, 229, 255, 0.2);
+
+  /* Palette Rose (pour les événements) */
+  --led-pink: #ff3d8b;
+  --glow-pink: rgba(255, 61, 139, 0.7);
+  --bg-pink-transparent: rgba(255, 61, 139, 0.2);
 
   /* Palette Blanche (pour l'accueil) */
   --led-white: #ffffff;

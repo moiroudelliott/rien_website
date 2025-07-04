@@ -3,7 +3,7 @@ import axios from 'axios';
 import UserProfileModal from '../components/UserProfileModal';
 import '../styles/_userlist.css';
 
-function UserList() {
+function UserList({ currentUser }) {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [viewingUserId, setViewingUserId] = useState(null);
@@ -55,9 +55,9 @@ function UserList() {
             {viewingUserId && (
                 <UserProfileModal 
                     discordIdToView={viewingUserId}
+                    currentUser={currentUser}
+                    isOwnProfile={currentUser?.discord_id === viewingUserId}
                     onClose={handleCloseModal}
-                    initialUser={{ discord_id: viewingUserId }}
-                    // isOwnProfile sera déterminé dans la modale, mais on peut le passer si on a l'info du currentUser ici
                 />
             )}
         </div>

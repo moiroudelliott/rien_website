@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import '../styles/_profile.css';
+import '../styles/_usercomments.css';
 import MovieDetailModal from './MovieDetailModal';
 import UserMoviesModal from './UserMoviesModal';
 
@@ -28,9 +29,40 @@ const SocialLink = ({ platform, url, username }) => {
     );
 };
 
+const getAvatarUrl = (user) => {
+    if (!user || !user.discord_id) return '/vite.svg'; // Fallback
+    if (user.avatar_hash) {
+        return `https://cdn.discordapp.com/avatars/${user.discord_id}/${user.avatar_hash}.png?size=32`;
+    }
+    const defaultAvatarIndex = (BigInt(user.discord_id) >> 22n) % 6n;
+    return `https://cdn.discordapp.com/embed/avatars/${defaultAvatarIndex}.png`;
+};
+
+const CommentBubble = ({ comment, style, onPop, isPopped }) => {
+    const commenterAvatarUrl = getAvatarUrl({ 
+        discord_id: comment.commenter_user_id, 
+        avatar_hash: comment.commenter_avatar_hash 
+    });
+
+    return (
+        <div className="comment-bubble-wrapper" style={style}>
+            <div 
+                className={`comment-bubble ${isPopped ? 'popped' : ''}`} 
+                onClick={() => onPop(comment.id)}
+            >
+                <div className="comment-author">
+                    <img src={commenterAvatarUrl} alt={comment.commenter_username} className="comment-author-avatar" />
+                    <span>{comment.commenter_first_name || comment.commenter_username}</span>
+                </div>
+                <p className="comment-text">{comment.comment_text}</p>
+            </div>
+        </div>
+    );
+};
+
 // Le composant principal de la modale
-function UserProfileModal({ discordIdToView, isOwnProfile, onClose, onProfileUpdated, initialUser }) {
-    const [user, setUser] = useState(initialUser); // Peut démarrer avec des données partielles
+function UserProfileModal({ discordIdToView, currentUser, isOwnProfile, onClose, onProfileUpdated }) {
+    const [user, setUser] = useState(null); // Peut démarrer avec des données partielles
     const [isLoadingProfile, setIsLoadingProfile] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState({});
@@ -49,6 +81,14 @@ function UserProfileModal({ discordIdToView, isOwnProfile, onClose, onProfileUpd
     const [isShaking, setIsShaking] = useState(false);
     const [isGlowing, setIsGlowing] = useState(false);
     const [isImageShaking, setIsImageShaking] = useState(false);
+
+    // --- NOUVEAUX ÉTATS POUR LES COMMENTAIRES ---
+    const [comments, setComments] = useState([]);
+    const [isLoadingComments, setIsLoadingComments] = useState(true);
+    const [myCommentText, setMyCommentText] = useState('');
+
+    // --- NOUVELLE REF ---
+    const modalContentRef = useRef(null); 
 
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
@@ -91,6 +131,44 @@ function UserProfileModal({ discordIdToView, isOwnProfile, onClose, onProfileUpd
                 });
         }
     }, [user, apiBaseUrl]);
+
+    // --- useEffect pour charger et préparer les commentaires (logique améliorée) ---
+    useEffect(() => {
+        if (user?.discord_id) {
+            setIsLoadingComments(true);
+            axios.get(`${apiBaseUrl}/get_user_comments.php?user_id=${user.discord_id}`)
+                .then(response => {
+                    const loadedComments = response.data || [];
+                    
+                    const bubbleWidth = 200;
+                    const bubbleHeight = 100; 
+                    const screenPadding = 20;
+
+                    // On prépare chaque commentaire avec son état et sa position UNE SEULE FOIS
+                    const commentsWithState = loadedComments.map(c => ({
+                        ...c,
+                        popped: false,
+                        style: { // La position est maintenant stockée avec le commentaire
+                            top: `${Math.random() * (window.innerHeight - bubbleHeight - screenPadding)}px`,
+                            left: `${Math.random() * (window.innerWidth - bubbleWidth - screenPadding)}px`,
+                            animationDelay: `${Math.random() * -15}s`,
+                        }
+                    }));
+                    
+                    setComments(commentsWithState);
+
+                    const myComment = loadedComments.find(c => c.commenter_user_id === currentUser.discord_id);
+                    setMyCommentText(myComment ? myComment.comment_text : '');
+                })
+                .catch(error => {
+                    console.error("Erreur lors du chargement des commentaires:", error);
+                    setComments([]);
+                })
+                .finally(() => {
+                    setIsLoadingComments(false);
+                });
+        }
+    }, [user?.discord_id, apiBaseUrl, currentUser.discord_id]); // Dépendance corrigée pour ne pas se redéclencher inutilement
 
     const handleOverlayClick = (e) => {
         if (e.target === e.currentTarget) {
@@ -164,6 +242,56 @@ function UserProfileModal({ discordIdToView, isOwnProfile, onClose, onProfileUpd
     const openUserMovies = () => setIsViewingUserMovies(true);
     const closeUserMovies = () => setIsViewingUserMovies(false);
 
+    // --- NOUVELLES FONCTIONS POUR GÉRER LES COMMENTAIRES ---
+    const handleCommentChange = (e) => {
+        setMyCommentText(e.target.value);
+    };
+
+    const handleCommentSubmit = (e) => {
+        e.preventDefault();
+        if (myCommentText.trim() === '') return;
+
+        axios.post(`${apiBaseUrl}/add_edit_user_comment.php`, {
+            profile_user_id: user.discord_id,
+            comment_text: myCommentText,
+        })
+        .then(() => {
+            alert('Commentaire sauvegardé !');
+            // Recharger les commentaires pour voir la mise à jour
+             axios.get(`${apiBaseUrl}/get_user_comments.php?user_id=${user.discord_id}`)
+                .then(response => setComments(response.data || []));
+        })
+        .catch(error => {
+            alert("Erreur: " + (error.response?.data?.message || "Impossible de sauvegarder le commentaire."));
+        });
+    };
+
+    const handleCommentDelete = () => {
+        if (!window.confirm("Voulez-vous vraiment supprimer votre commentaire ?")) return;
+
+        axios.post(`${apiBaseUrl}/delete_user_comment.php`, { profile_user_id: user.discord_id })
+        .then(() => {
+            alert('Commentaire supprimé.');
+            setMyCommentText('');
+            // Recharger les commentaires
+             axios.get(`${apiBaseUrl}/get_user_comments.php?user_id=${user.discord_id}`)
+                .then(response => setComments(response.data || []));
+        })
+        .catch(error => {
+             alert("Erreur: " + (error.response?.data?.message || "Impossible de supprimer le commentaire."));
+        });
+    };
+
+    // --- NOUVELLE FONCTION pour éclater la bulle ---
+    const handlePopBubble = (commentId) => {
+        setComments(prevComments =>
+            prevComments.map(c => c.id === commentId ? { ...c, popped: true } : c)
+        );
+        setTimeout(() => {
+            setComments(prevComments => prevComments.filter(c => c.id !== commentId));
+        }, 400);
+    };
+
     return (
         <>
             {/* Le sprite est ici, en dehors de la modale pour le positionnement fixed */}
@@ -171,9 +299,21 @@ function UserProfileModal({ discordIdToView, isOwnProfile, onClose, onProfileUpd
 
             {!isViewingUserMovies &&
                 <div className="profile-modal-overlay" onClick={handleOverlayClick}>
-                    <div 
-                        className={`profile-modal-content ${isShaking ? 'modal-shake' : ''} ${isGlowing ? 'modal-glow' : ''}`}
-                    >
+                    
+                    {/* Le conteneur est maintenant ici pour couvrir toute la page */}
+                    <div className="comments-container">
+                        {!isLoadingComments && comments.map((comment) => (
+                            <CommentBubble 
+                                key={comment.id}
+                                comment={comment}
+                                style={comment.style}
+                                onPop={handlePopBubble}
+                                isPopped={comment.popped}
+                            />
+                        ))}
+                    </div>
+
+                    <div ref={modalContentRef} className={`profile-modal-content ${isShaking ? 'modal-shake' : ''} ${isGlowing ? 'modal-glow' : ''}`} style={{ zIndex: 1000 }}>
                         <button onClick={onClose} className="close-button" title="Fermer">×</button>
 
                         {/* Aiguillage : Affiche le profil OU le formulaire d'édition */}
@@ -237,6 +377,26 @@ function UserProfileModal({ discordIdToView, isOwnProfile, onClose, onProfileUpd
                                 {isOwnProfile && (
                                     <div className="profile-actions">
                                         <button onClick={handleEditClick} className="edit-profile-button">Modifier mon profil</button>
+                                    </div>
+                                )}
+
+                                {currentUser && !isOwnProfile && (
+                                    <div className="comment-form-container">
+                                        <h4>Laissez un commentaire</h4>
+                                        <form onSubmit={handleCommentSubmit} className="comment-form">
+                                            <textarea
+                                                value={myCommentText}
+                                                onChange={handleCommentChange}
+                                                placeholder="Écrivez quelque chose de sympa..."
+                                                maxLength="200"
+                                            />
+                                            <div className="comment-form-actions">
+                                                {myCommentText && (
+                                                     <button type="button" onClick={handleCommentDelete} className="btn btn-delete">Supprimer</button>
+                                                )}
+                                                <button type="submit" className="btn btn-save">Sauvegarder</button>
+                                            </div>
+                                        </form>
                                     </div>
                                 )}
                             </>

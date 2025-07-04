@@ -158,7 +158,7 @@ function App() {
           <Route path="/" element={<Navigate to="/home" replace />} />
           <Route path="/home" element={<Home />} />
           <Route path="/cinema" element={<CinemaHome user={currentUser} />} />
-          <Route path="/users" element={<UserList />} />
+          <Route path="/users" element={<UserList currentUser={currentUser} />} />
           <Route path="/events" element={<EventsPage currentUser={currentUser} />} />
           <Route 
             path="/map" 

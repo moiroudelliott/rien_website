@@ -136,6 +136,7 @@ const CinemaHome = ({ user: currentUser }) => {
             {viewingUserId && (
                 <UserProfileModal 
                     discordIdToView={viewingUserId}
+                    currentUser={currentUser}
                     isOwnProfile={viewingUserId === currentUser.discord_id}
                     onClose={() => setViewingUserId(null)}
                     initialUser={{ discord_id: viewingUserId }}

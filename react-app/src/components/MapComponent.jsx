@@ -191,10 +191,10 @@ function MapComponent({ currentUser, onProfileUpdated }) {
             {viewingUserId && (
                 <UserProfileModal
                     discordIdToView={viewingUserId}
+                    currentUser={currentUser}
                     isOwnProfile={viewingUserId === currentUser.discord_id}
                     onClose={() => setViewingUserId(null)}
                     onProfileUpdated={handleProfileUpdateInMap}
-                    initialUser={{ discord_id: viewingUserId, username: locations.find(u => u.discord_id === viewingUserId)?.username }}
                 />
             )}
         </div>

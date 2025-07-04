@@ -209,9 +209,10 @@ function EventDetailModal({ event, currentUser, onClose, onEventDeleted, onEdit 
                     plugins={[Video, Download]}
                 />
             )}
-            {viewingUserId && (
+             {viewingUserId && (
                 <UserProfileModal
                     discordIdToView={viewingUserId}
+                    currentUser={currentUser}
                     isOwnProfile={currentUser?.discord_id === viewingUserId}
                     onClose={() => setViewingUserId(null)}
                 />

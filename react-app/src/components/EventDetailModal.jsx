@@ -1,28 +1,34 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import axios from 'axios';
 import Lightbox from "yet-another-react-lightbox";
 import Video from "yet-another-react-lightbox/plugins/video";
 import Download from "yet-another-react-lightbox/plugins/download";
 import "yet-another-react-lightbox/styles.css";
-import '../styles/_eventdetailmodal.css'; // Importation du fichier CSS
-import MediaUploader from './MediaUploader'; // 1. Importer le nouveau composant
+import '../styles/_eventdetailmodal.css';
+import MediaUploader from './MediaUploader';
 import UserProfileModal from './UserProfileModal';
+import { useEventDetails } from '../hooks/useApi';
+import { useUserModal } from '../hooks/useUserModal';
+import { getAvatarUrl, formatEventDate, getMediaUrl } from '../utils';
 
 function EventDetailModal({ event, currentUser, onClose, onEventDeleted, onEdit }) {
-    const [details, setDetails] = useState(event); // 1. On initialise avec les données de base
-    const [loadingExtraDetails, setLoadingExtraDetails] = useState(true); // 2. State pour le chargement des détails
     const [error, setError] = useState('');
     const [lightboxOpen, setLightboxOpen] = useState(false);
     const [lightboxIndex, setLightboxIndex] = useState(0);
-    const [viewingUserId, setViewingUserId] = useState(null);
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+    
+    const { data: eventDetails, loading: loadingExtraDetails, refetch: fetchEventDetails } = useEventDetails(event?.id);
+    const { viewingUserId, openUserModal, closeUserModal } = useUserModal();
+
+    // Fusionner les données de base avec les détails chargés
+    const details = eventDetails ? { ...event, ...eventDetails } : event;
 
     const handleDelete = async () => {
         if (window.confirm("Êtes-vous sûr de vouloir supprimer cet événement ? Cette action est irréversible.")) {
             try {
                 await axios.post(`${apiBaseUrl}/delete_event.php`, { event_id: details.id }, { withCredentials: true });
-                onEventDeleted(); // Notify parent to refresh list
-                onClose();      // Close modal
+                onEventDeleted();
+                onClose();
             } catch (err) {
                 console.error("Erreur lors de la suppression de l'événement:", err);
                 setError(err.response?.data?.message || "Impossible de supprimer l'événement.");
@@ -30,65 +36,10 @@ function EventDetailModal({ event, currentUser, onClose, onEventDeleted, onEdit 
         }
     };
 
-    const fetchEventDetails = useCallback(() => {
-        if (!event?.id) return;
-
-        axios.get(`${apiBaseUrl}/get_event_details.php?id=${event.id}`, { withCredentials: true })
-            .then(response => {
-                console.log('--- Full Event Details from API ---', response.data); // Débogage
-                setDetails(prevDetails => ({
-                    ...prevDetails,
-                    ...response.data
-                }));
-            })
-            .catch(err => {
-                console.error("Erreur de chargement des détails de l'événement:", err);
-                setError(err.response?.data?.message || "Impossible de charger les détails.");
-            })
-            .finally(() => {
-                setLoadingExtraDetails(false);
-            });
-    }, [event.id, apiBaseUrl]);
-
-    useEffect(() => {
-        if (event?.id) {
-            setLoadingExtraDetails(true);
-            fetchEventDetails();
-        }
-    }, [event, fetchEventDetails]);
-
     const handleOverlayClick = (e) => {
         if (e.target === e.currentTarget) {
             onClose();
         }
-    };
-
-    const getAvatarUrl = (user) => {
-        console.log('--- Avatar generation for user ---', user); // Débogage
-        if (!user || !user.discord_id) return '/vite.svg'; // Fallback de sécurité
-
-        if (user.avatar_hash) {
-            return `https://cdn.discordapp.com/avatars/${user.discord_id}/${user.avatar_hash}.png?size=64`;
-        } else {
-            // Calcule l'avatar par défaut de Discord
-            const defaultAvatarIndex = (BigInt(user.discord_id) >> 22n) % 6n;
-            return `https://cdn.discordapp.com/embed/avatars/${defaultAvatarIndex}.png`;
-        }
-    };
-
-    const getMediaUrl = (filePath) => {
-        if (!filePath) return '';
-        const webRoot = apiBaseUrl.substring(0, apiBaseUrl.lastIndexOf('/backend'));
-        return `${webRoot}/${filePath}`;
-    };
-
-    const formatEventDate = (dateString) => {
-        if (!dateString) return "Date non spécifiée";
-        const date = new Date(dateString);
-        return date.toLocaleString('fr-FR', {
-            dateStyle: 'full',
-            timeStyle: 'short'
-        });
     };
 
     const openLightbox = (index) => {
@@ -137,7 +88,7 @@ function EventDetailModal({ event, currentUser, onClose, onEventDeleted, onEdit 
                                             <h3>Participants</h3>
                                             <div className="attendees-grid">
                                                 {details.attendees.map(attendee => (
-                                                    <div key={attendee.id} className="attendee-item" onClick={() => setViewingUserId(attendee.discord_id)}>
+                                                    <div key={attendee.id} className="attendee-item" onClick={() => openUserModal(attendee)}>
                                                         <img src={getAvatarUrl(attendee)} alt={attendee.username} className="attendee-avatar" />
                                                         <span className="attendee-username">{attendee.username}</span>
                                                     </div>
@@ -157,11 +108,11 @@ function EventDetailModal({ event, currentUser, onClose, onEventDeleted, onEdit 
                                             {details.media && details.media.map((m, index) => (
                                                 <div key={m.id} className="media-item" onClick={() => openLightbox(index)}>
                                                     {m.media_type === 'photo' ? (
-                                                        <img src={getMediaUrl(m.file_path)} alt={`Média de l'événement`} />
+                                                        <img src={getMediaUrl(m.file_path, apiBaseUrl)} alt={`Média de l'événement`} />
                                                     ) : (
                                                         <>
                                                             {m.thumbnail_path ? (
-                                                                <img src={getMediaUrl(m.thumbnail_path)} alt={`Miniature de la vidéo`} />
+                                                                <img src={getMediaUrl(m.thumbnail_path, apiBaseUrl)} alt={`Miniature de la vidéo`} />
                                                             ) : (
                                                                 <div className="video-thumbnail">▶</div>
                                                             )}
@@ -186,15 +137,15 @@ function EventDetailModal({ event, currentUser, onClose, onEventDeleted, onEdit 
                     open={lightboxOpen}
                     close={() => setLightboxOpen(false)}
                     slides={details.media.map(m => {
-                        const url = getMediaUrl(m.file_path);
+                        const url = getMediaUrl(m.file_path, apiBaseUrl);
                         if (m.media_type === 'video') {
                             return {
                                 type: 'video',
-                                poster: m.thumbnail_path ? getMediaUrl(m.thumbnail_path) : '',
+                                poster: m.thumbnail_path ? getMediaUrl(m.thumbnail_path, apiBaseUrl) : '',
                                 sources: [
                                     {
                                         src: url,
-                                        type: 'video/mp4' // Assurez-vous que le type MIME est correct
+                                        type: 'video/mp4'
                                     }
                                 ],
                                 download: url
@@ -214,7 +165,7 @@ function EventDetailModal({ event, currentUser, onClose, onEventDeleted, onEdit 
                     discordIdToView={viewingUserId}
                     currentUser={currentUser}
                     isOwnProfile={currentUser?.discord_id === viewingUserId}
-                    onClose={() => setViewingUserId(null)}
+                    onClose={closeUserModal}
                 />
             )}
         </>

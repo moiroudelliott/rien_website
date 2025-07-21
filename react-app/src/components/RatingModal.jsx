@@ -28,8 +28,6 @@ const RatingModal = ({ movie, onClose, onSubmit }) => {
             is_favorite: isFavorite,
         };
 
-        console.log("Payload envoyé à rate_movie.php:", payload);
-
         axios.post(`${apiBaseUrl}/rate_movie.php`, payload, { withCredentials: true })
             .then(() => {
                 if (onSubmit) {
@@ -66,25 +64,25 @@ const RatingModal = ({ movie, onClose, onSubmit }) => {
                         {[...Array(10)].map((_, index) => {
                             const starValue = index + 1;
                             return (
-                                <span 
+                            <span
                                     key={starValue}
                                     className={`star ${starValue <= (hoverRating || rating) ? 'filled' : ''}`}
                                     onClick={() => setRating(starValue)}
                                     onMouseEnter={() => setHoverRating(starValue)}
                                     onMouseLeave={() => setHoverRating(0)}
-                                >
-                                    ★
-                                </span>
+                            >
+                                ★
+                            </span>
                             );
                         })}
                     </div>
 
                     <div className="favorite-toggle-container">
                         <label className="switch">
-                            <input 
-                                type="checkbox" 
-                                checked={isFavorite} 
-                                onChange={(e) => setIsFavorite(e.target.checked)} 
+                            <input
+                                type="checkbox"
+                                checked={isFavorite}
+                                onChange={(e) => setIsFavorite(e.target.checked)}
                             />
                             <span className="slider round"></span>
                         </label>

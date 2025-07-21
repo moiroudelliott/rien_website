@@ -1,33 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React from 'react';
 import UserProfileModal from '../components/UserProfileModal';
+import { useUsers } from '../hooks/useApi';
+import { useUserModal } from '../hooks/useUserModal';
+import { getAvatarUrl } from '../utils';
 import '../styles/_userlist.css';
 
 function UserList({ currentUser }) {
-    const [users, setUsers] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [viewingUserId, setViewingUserId] = useState(null);
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-
-    useEffect(() => {
-        axios.get(`${apiBaseUrl}/get_all_users.php`)
-            .then(response => {
-                setUsers(response.data);
-                setLoading(false);
-            })
-            .catch(error => {
-                console.error("Erreur de chargement des utilisateurs:", error);
-                setLoading(false);
-            });
-    }, [apiBaseUrl]);
-
-    const handleUserClick = (user) => {
-        setViewingUserId(user.discord_id);
-    };
-
-    const handleCloseModal = () => {
-        setViewingUserId(null);
-    };
+    const { data: users, loading } = useUsers();
+    const { viewingUserId, openUserModal, closeUserModal } = useUserModal();
 
     if (loading) {
         return <div className="loading-screen">Chargement des utilisateurs...</div>;
@@ -37,10 +17,10 @@ function UserList({ currentUser }) {
         <div className="page-container">
             <h1 className="page-title">Liste des utilisateurs</h1>
             <div className="users-grid">
-                {users.map(user => (
-                    <div key={user.discord_id} className="user-card-list" onClick={() => handleUserClick(user)}>
+                {users?.map(user => (
+                    <div key={user.discord_id} className="user-card-list" onClick={() => openUserModal(user)}>
                         <img 
-                            src={user.avatar_hash ? `https://cdn.discordapp.com/avatars/${user.discord_id}/${user.avatar_hash}.png?size=128` : '/vite.svg'} 
+                            src={getAvatarUrl(user, 128)} 
                             alt={`Avatar de ${user.username}`} 
                             className="user-avatar"
                         />
@@ -57,7 +37,7 @@ function UserList({ currentUser }) {
                     discordIdToView={viewingUserId}
                     currentUser={currentUser}
                     isOwnProfile={currentUser?.discord_id === viewingUserId}
-                    onClose={handleCloseModal}
+                    onClose={closeUserModal}
                 />
             )}
         </div>

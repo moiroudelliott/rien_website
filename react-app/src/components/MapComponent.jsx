@@ -1,12 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, useMapEvents, ZoomControl } from 'react-leaflet';
 import L from 'leaflet';
 import axios from 'axios';
 import UserProfileModal from './UserProfileModal';
+import { useUsers } from '../hooks/useApi';
+import { useUserModal } from '../hooks/useUserModal';
+import { getAvatarUrl } from '../utils';
 import 'leaflet/dist/leaflet.css';
 import '../styles/_map.css';
 
-// --- CONFIGURATION & FONCTIONS UTILITAIRES ---
 // Fix pour les icônes par défaut de Leaflet avec les bundlers modernes
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -15,19 +17,10 @@ L.Icon.Default.mergeOptions({
     shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
 });
 
-// Fonction utilitaire pour construire l'URL de l'avatar Discord
-const getAvatarUrl = (user, size = 64) => {
-    return user.avatar_hash
-        ? `https://cdn.discordapp.com/avatars/${user.discord_id}/${user.avatar_hash}.png?size=${size}`
-        : '/vite.svg'; // Fallback
-};
-
-// --- COMPOSANTS D'INTERFACE INTERNES ---
-
 // Composant pour le header avec les infos et actions de l'utilisateur
 const HeaderControl = ({ currentUser, onProfileClick, onGeolocate, onDeleteLocation }) => {
     const headerRef = useRef(null);
-    useEffect(() => {
+    React.useEffect(() => {
         if (headerRef.current) {
             L.DomEvent.disableClickPropagation(headerRef.current);
         }
@@ -52,7 +45,7 @@ const HeaderControl = ({ currentUser, onProfileClick, onGeolocate, onDeleteLocat
 
 const SaveLocationControl = ({ position, onSave, onCancel }) => {
     const bannerRef = useRef(null);
-    useEffect(() => {
+    React.useEffect(() => {
         if (bannerRef.current) {
             L.DomEvent.disableClickPropagation(bannerRef.current);
         }
@@ -75,8 +68,6 @@ const SaveLocationControl = ({ position, onSave, onCancel }) => {
     );
 };
 
-// --- COMPOSANT PRINCIPAL DE LA CARTE ---
-
 function LocationMarker({ onMapClick }) {
   useMapEvents({
     click(e) {
@@ -87,28 +78,15 @@ function LocationMarker({ onMapClick }) {
 }
 
 function MapComponent({ currentUser, onProfileUpdated }) {
-    const [locations, setLocations] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [viewingUserId, setViewingUserId] = useState(null);
     const [selectedPosition, setSelectedPosition] = useState(null);
     const mapRef = useRef(null);
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+    
+    const { data: allUsers, loading, refetch: refetchLocations } = useUsers(true);
+    const { viewingUserId, openUserModal, closeUserModal } = useUserModal();
 
-    const fetchLocations = () => {
-        axios.get(`${apiBaseUrl}/get_all_users.php?with_location=true`)
-            .then(response => {
-                const validUsers = response.data.filter(user => user.latitude != null && user.longitude != null);
-                setLocations(validUsers);
-            })
-            .catch(error => console.error("Erreur de chargement des utilisateurs:", error))
-            .finally(() => setIsLoading(false));
-    };
-
-    useEffect(() => {
-        fetchLocations();
-    }, []);
-
-    const handleMarkerClick = (user) => setViewingUserId(user.discord_id);
+    // Filtrer les utilisateurs avec des positions valides
+    const locations = allUsers?.filter(user => user.latitude != null && user.longitude != null) || [];
 
     const handleGeolocate = () => {
         if (!navigator.geolocation) {
@@ -130,7 +108,7 @@ function MapComponent({ currentUser, onProfileUpdated }) {
             axios.post(`${apiBaseUrl}/delete_location.php`)
                 .then(() => {
                     alert("Votre position a été supprimée.");
-                    fetchLocations(); // Rafraîchit les données
+                    refetchLocations();
                 })
                 .catch(error => console.error("Erreur lors de la suppression :", error));
         }
@@ -142,7 +120,7 @@ function MapComponent({ currentUser, onProfileUpdated }) {
             .then(() => {
                 alert('Position enregistrée !');
                 setSelectedPosition(null);
-                fetchLocations();
+                refetchLocations();
             })
             .catch(error => {
                 console.error("Erreur lors de la sauvegarde:", error);
@@ -151,19 +129,13 @@ function MapComponent({ currentUser, onProfileUpdated }) {
     };
 
     const handleProfileUpdateInMap = (updatedProfile) => {
-        setLocations(prevLocations =>
-            prevLocations.map(loc =>
-                loc.discord_id === updatedProfile.discord_id
-                    ? { ...loc, ...updatedProfile }
-                    : loc
-            )
-        );
+        refetchLocations();
         if (currentUser.discord_id === updatedProfile.discord_id) {
             onProfileUpdated(updatedProfile);
         }
     };
 
-    if (isLoading) return <div className="loading-spinner"></div>;
+    if (loading) return <div className="loading-spinner"></div>;
 
     return (
         <div className="map-wrapper">
@@ -171,14 +143,23 @@ function MapComponent({ currentUser, onProfileUpdated }) {
                 <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>' />
                 <ZoomControl position="topleft" />
                 <LocationMarker onMapClick={(latlng) => setSelectedPosition(latlng)} />
-                <HeaderControl currentUser={currentUser} onProfileClick={() => setViewingUserId(currentUser.discord_id)} onGeolocate={handleGeolocate} onDeleteLocation={handleDeleteLocation} />
-                <SaveLocationControl position={selectedPosition} onSave={handleSaveLocation} onCancel={() => setSelectedPosition(null)} />
+                <HeaderControl 
+                    currentUser={currentUser} 
+                    onProfileClick={() => openUserModal(currentUser)} 
+                    onGeolocate={handleGeolocate} 
+                    onDeleteLocation={handleDeleteLocation} 
+                />
+                <SaveLocationControl 
+                    position={selectedPosition} 
+                    onSave={handleSaveLocation} 
+                    onCancel={() => setSelectedPosition(null)} 
+                />
                 {selectedPosition && <Marker position={selectedPosition}></Marker>}
                 {locations.map(user => (
                     <Marker
                         key={user.discord_id}
                         position={[user.latitude, user.longitude]}
-                        eventHandlers={{ click: () => handleMarkerClick(user) }}
+                        eventHandlers={{ click: () => openUserModal(user) }}
                         icon={L.divIcon({
                             className: 'discord-avatar-marker',
                             html: `<div class="avatar-container"><img src="${getAvatarUrl(user)}" alt="${user.username}" /></div><div class="marker-arrow"></div>`,
@@ -193,7 +174,7 @@ function MapComponent({ currentUser, onProfileUpdated }) {
                     discordIdToView={viewingUserId}
                     currentUser={currentUser}
                     isOwnProfile={viewingUserId === currentUser.discord_id}
-                    onClose={() => setViewingUserId(null)}
+                    onClose={closeUserModal}
                     onProfileUpdated={handleProfileUpdateInMap}
                 />
             )}

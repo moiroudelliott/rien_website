@@ -44,8 +44,6 @@ const MovieSearch = () => {
                 const movieIds = tmdbResults.map(m => m.id).join(',');
                 const ratingsResponse = await axios.get(`${apiBaseUrl}/get_ratings_for_movies.php?ids=${movieIds}`, { withCredentials: true });
                 
-                console.log("Données de notation reçues du serveur :", ratingsResponse.data);
-                
                 setRatingsData(ratingsResponse.data);
             }
 
@@ -110,6 +108,8 @@ const MovieSearch = () => {
             <div className="movie-results">
                 {results.map(movie => {
                     const movieRatings = ratingsData[movie.id];
+                    const hasValidRatings = movieRatings && movieRatings.raters && Array.isArray(movieRatings.raters);
+                    
                     return (
                         <div key={movie.id} className="movie-card">
                             <img 
@@ -124,7 +124,7 @@ const MovieSearch = () => {
                                 </div>
 
                                 <div className="movie-card-bottom">
-                                    {movieRatings && (
+                                    {hasValidRatings && (
                                         <div className="search-ratings-info">
                                             <div className="search-avg-rating">
                                                 <span role="img" aria-label="Étoile">⭐</span>

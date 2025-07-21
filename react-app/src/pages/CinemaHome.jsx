@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import axios from 'axios';
 import '../styles/_cinema.css';
 import MovieSearch from '../components/MovieSearch';
@@ -7,31 +7,28 @@ import MovieDetailModal from '../components/MovieDetailModal';
 import UserMoviesModal from '../components/UserMoviesModal';
 import ProfileCompletion from '../components/ProfileCompletion';
 import ConfettiRain from '../components/ConfettiRain';
+import { useUserModal } from '../hooks/useUserModal';
+import { useUserMovies } from '../hooks/useApi';
 
 const CinemaHome = ({ user: currentUser }) => {
     const [latestMovies, setLatestMovies] = useState([]);
-    const [userMovies, setUserMovies] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [viewingUserId, setViewingUserId] = useState(null);
     const [viewingMovieId, setViewingMovieId] = useState(null);
     const [modalData, setModalData] = useState(null);
     const [isModalLoading, setIsModalLoading] = useState(false);
     const [isProfileComplete, setIsProfileComplete] = useState(false);
     const [showConfetti, setShowConfetti] = useState(false);
     const [viewingUserMovies, setViewingUserMovies] = useState(null);
+    
+    const { viewingUserId, openUserModal, closeUserModal } = useUserModal();
+    const { data: userMovies, refetch: refetchUserMovies } = useUserMovies();
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
-    const fetchData = useCallback(async () => {
+    const fetchLatestMovies = useCallback(async () => {
         setLoading(true);
         try {
-            const [latestMoviesResponse, userMoviesResponse] = await Promise.all([
-                axios.get(`${apiBaseUrl}/get_latest_movies.php`, { withCredentials: true }),
-                axios.get(`${apiBaseUrl}/get_user_movies.php`, { withCredentials: true })
-            ]);
-            
-            setLatestMovies(latestMoviesResponse.data);
-            setUserMovies(userMoviesResponse.data);
-
+            const response = await axios.get(`${apiBaseUrl}/get_latest_movies.php`, { withCredentials: true });
+            setLatestMovies(response.data);
         } catch (error) {
             console.error("Erreur lors de la récupération des données du cinéma:", error);
         } finally {
@@ -39,13 +36,9 @@ const CinemaHome = ({ user: currentUser }) => {
         }
     }, [apiBaseUrl]);
 
-    useEffect(() => {
-        fetchData();
-    }, [fetchData]);
-
-    const handleUserClick = (user) => {
-        setViewingUserId(user.discord_id);
-    };
+    React.useEffect(() => {
+        fetchLatestMovies();
+    }, [fetchLatestMovies]);
 
     const openMovieDetails = useCallback((movieId) => {
         setViewingMovieId(movieId);
@@ -69,7 +62,7 @@ const CinemaHome = ({ user: currentUser }) => {
     };
 
     const handleRatingSuccess = () => {
-        fetchData(); 
+        refetchUserMovies();
         if (viewingMovieId) {
             openMovieDetails(viewingMovieId);
         }
@@ -104,7 +97,7 @@ const CinemaHome = ({ user: currentUser }) => {
                 <div className="cinema-content">
                     <div className="user-movies-section">
                         <div className="movie-carousel">
-                            {userMovies.length > 0 ? (
+                            {userMovies?.length > 0 ? (
                                 userMovies.map(movie => (
                                     <div key={movie.api_movie_id} className="movie-item">
                                         {/* ... affichage de chaque film ... */}
@@ -120,7 +113,7 @@ const CinemaHome = ({ user: currentUser }) => {
                         <ul className="compact-activity-list">
                             {latestMovies.map(activity => (
                                 <li key={`${activity.discord_id}-${activity.api_movie_id}`} className="compact-activity-item">
-                                    <span onClick={() => handleUserClick(activity)} className="username-link">{activity.username}</span>
+                                    <span onClick={() => openUserModal(activity)} className="username-link">{activity.username}</span>
                                     {' a noté le film '}
                                     <span className="movie-title-link" onClick={() => openMovieDetails(activity.api_movie_id)}>
                                         {activity.title}
@@ -138,7 +131,7 @@ const CinemaHome = ({ user: currentUser }) => {
                     discordIdToView={viewingUserId}
                     currentUser={currentUser}
                     isOwnProfile={viewingUserId === currentUser.discord_id}
-                    onClose={() => setViewingUserId(null)}
+                    onClose={closeUserModal}
                     initialUser={{ discord_id: viewingUserId }}
                 />
             )}

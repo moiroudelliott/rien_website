@@ -4,6 +4,9 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
+// TEST TEMPORAIRE - SUPPRIMER APRÈS VÉRIFICATION
+import './test-env.js';
+
 // Import des pages
 import Home from './pages/Home';
 import MapPage from './pages/MapPage';

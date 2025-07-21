@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { getAvatarUrl } from '../utils';
 import '../styles/_usermultiselect.css';
 
 function UserMultiSelect({ allUsers, selectedUserIds, onChange, currentUser }) {
@@ -6,20 +7,10 @@ function UserMultiSelect({ allUsers, selectedUserIds, onChange, currentUser }) {
     const [isOpen, setIsOpen] = useState(false);
     const containerRef = useRef(null);
 
-    const getAvatarUrl = (user) => {
-        if (!user || !user.discord_id) return '/vite.svg';
-        if (user.avatar_hash) {
-            return `https://cdn.discordapp.com/avatars/${user.discord_id}/${user.avatar_hash}.png?size=64`;
-        } else {
-            const defaultAvatarIndex = (BigInt(user.discord_id) >> 22n) % 6n;
-            return `https://cdn.discordapp.com/embed/avatars/${defaultAvatarIndex}.png`;
-        }
-    };
-
     const availableUsers = useMemo(() => {
         const lowercasedFilter = searchTerm.toLowerCase();
         return allUsers
-            .filter(u => u.id !== currentUser.id) // Exclure l'utilisateur actuel
+            .filter(u => u.id !== currentUser.id)
             .filter(u => !selectedUserIds.includes(u.id))
             .filter(u => {
                 const fullName = `${u.first_name || ''} ${u.last_name || ''}`.toLowerCase();
@@ -70,16 +61,22 @@ function UserMultiSelect({ allUsers, selectedUserIds, onChange, currentUser }) {
                     placeholder={selectedUsers.length === 0 ? "Inviter des membres..." : ""}
                 />
             </div>
-            {isOpen && availableUsers.length > 0 && (
+
+            {isOpen && (
                 <div className="user-dropdown">
-                    {availableUsers.map(user => (
-                        <div key={user.id} className="user-dropdown-item" onClick={() => addUser(user.id)}>
-                            <img src={getAvatarUrl(user)} alt={user.username} />
-                            <span>
-                                {user.first_name} {user.last_name} <span className="username-display">({user.username})</span>
-                            </span>
-                        </div>
-                    ))}
+                    {availableUsers.length > 0 ? (
+                        availableUsers.slice(0, 10).map(user => (
+                            <div key={user.id} className="user-option" onClick={() => addUser(user.id)}>
+                                <img src={getAvatarUrl(user)} alt={user.username} />
+                                <div className="user-details">
+                                    <span className="user-name">{user.first_name} {user.last_name}</span>
+                                    <span className="user-username">@{user.username}</span>
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <div className="no-users-message">Aucun utilisateur trouvé</div>
+                    )}
                 </div>
             )}
         </div>

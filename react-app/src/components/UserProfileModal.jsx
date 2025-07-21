@@ -257,9 +257,37 @@ function UserProfileModal({ discordIdToView, currentUser, isOwnProfile, onClose,
         })
         .then(() => {
             alert('Commentaire sauvegardé !');
-            // Recharger les commentaires pour voir la mise à jour
-             axios.get(`${apiBaseUrl}/get_user_comments.php?user_id=${user.discord_id}`)
-                .then(response => setComments(response.data || []));
+            // Recharger les commentaires en préservant les positions existantes
+            axios.get(`${apiBaseUrl}/get_user_comments.php?user_id=${user.discord_id}`)
+                .then(response => {
+                    const loadedComments = response.data || [];
+                    
+                    const bubbleWidth = 200;
+                    const bubbleHeight = 100; 
+                    const screenPadding = 20;
+
+                    // Préserver les positions existantes, générer seulement pour les nouveaux
+                    const commentsWithState = loadedComments.map(newComment => {
+                        const existingComment = comments.find(c => c.id === newComment.id);
+                        if (existingComment) {
+                            // Garder la position et l'état existants, mais mettre à jour le contenu
+                            return { ...newComment, popped: existingComment.popped, style: existingComment.style };
+                        } else {
+                            // Nouveau commentaire : générer une nouvelle position
+                            return {
+                                ...newComment,
+                                popped: false,
+                                style: {
+                                    top: `${Math.random() * (window.innerHeight - bubbleHeight - screenPadding)}px`,
+                                    left: `${Math.random() * (window.innerWidth - bubbleWidth - screenPadding)}px`,
+                                    animationDelay: `${Math.random() * -15}s`,
+                                }
+                            };
+                        }
+                    });
+                    
+                    setComments(commentsWithState);
+                });
         })
         .catch(error => {
             alert("Erreur: " + (error.response?.data?.message || "Impossible de sauvegarder le commentaire."));
@@ -273,9 +301,35 @@ function UserProfileModal({ discordIdToView, currentUser, isOwnProfile, onClose,
         .then(() => {
             alert('Commentaire supprimé.');
             setMyCommentText('');
-            // Recharger les commentaires
-             axios.get(`${apiBaseUrl}/get_user_comments.php?user_id=${user.discord_id}`)
-                .then(response => setComments(response.data || []));
+            // Recharger les commentaires en préservant les positions existantes
+            axios.get(`${apiBaseUrl}/get_user_comments.php?user_id=${user.discord_id}`)
+                .then(response => {
+                    const loadedComments = response.data || [];
+                    
+                    const bubbleWidth = 200;
+                    const bubbleHeight = 100; 
+                    const screenPadding = 20;
+
+                    // Préserver les positions existantes pour les commentaires restants
+                    const commentsWithState = loadedComments.map(newComment => {
+                        const existingComment = comments.find(c => c.id === newComment.id);
+                        if (existingComment) {
+                            return { ...newComment, popped: existingComment.popped, style: existingComment.style };
+                        } else {
+                            return {
+                                ...newComment,
+                                popped: false,
+                                style: {
+                                    top: `${Math.random() * (window.innerHeight - bubbleHeight - screenPadding)}px`,
+                                    left: `${Math.random() * (window.innerWidth - bubbleWidth - screenPadding)}px`,
+                                    animationDelay: `${Math.random() * -15}s`,
+                                }
+                            };
+                        }
+                    });
+                    
+                    setComments(commentsWithState);
+                });
         })
         .catch(error => {
              alert("Erreur: " + (error.response?.data?.message || "Impossible de supprimer le commentaire."));
@@ -384,12 +438,20 @@ function UserProfileModal({ discordIdToView, currentUser, isOwnProfile, onClose,
                                     <div className="comment-form-container">
                                         <h4>Laissez un commentaire</h4>
                                         <form onSubmit={handleCommentSubmit} className="comment-form">
-                                            <textarea
-                                                value={myCommentText}
-                                                onChange={handleCommentChange}
-                                                placeholder="Écrivez quelque chose de sympa..."
-                                                maxLength="200"
-                                            />
+                                            <div className="textarea-wrapper">
+                                                <textarea
+                                                    value={myCommentText}
+                                                    onChange={handleCommentChange}
+                                                    placeholder="Écrivez quelque chose de sympa..."
+                                                    maxLength="40"
+                                                />
+                                                <div className={`character-counter ${
+                                                    myCommentText.length > 35 ? 'danger' : 
+                                                    myCommentText.length > 25 ? 'warning' : ''
+                                                }`}>
+                                                    {myCommentText.length}/40
+                                                </div>
+                                            </div>
                                             <div className="comment-form-actions">
                                                 {myCommentText && (
                                                      <button type="button" onClick={handleCommentDelete} className="btn btn-delete">Supprimer</button>

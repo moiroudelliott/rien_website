@@ -86,8 +86,19 @@
     border-radius: 50%;
 }
 
-.user-dropdown-item .username-display {
-    color: #888;
-    font-size: 0.9em;
-    margin-left: 5px;
+.user-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-name {
+    color: var(--text-main);
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+.username-display {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    margin-top: 0.1rem;
 } 

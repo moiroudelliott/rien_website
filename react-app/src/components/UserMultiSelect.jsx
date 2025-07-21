@@ -66,11 +66,11 @@ function UserMultiSelect({ allUsers, selectedUserIds, onChange, currentUser }) {
                 <div className="user-dropdown">
                     {availableUsers.length > 0 ? (
                         availableUsers.slice(0, 10).map(user => (
-                            <div key={user.id} className="user-option" onClick={() => addUser(user.id)}>
+                            <div key={user.id} className="user-dropdown-item" onClick={() => addUser(user.id)}>
                                 <img src={getAvatarUrl(user)} alt={user.username} />
                                 <div className="user-details">
                                     <span className="user-name">{user.first_name} {user.last_name}</span>
-                                    <span className="user-username">@{user.username}</span>
+                                    <span className="username-display">@{user.username}</span>
                                 </div>
                             </div>
                         ))

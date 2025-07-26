@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import axios from 'axios';
 import '../styles/_moviesearch.css';
 import MovieDetailModal from './MovieDetailModal';
@@ -7,6 +7,7 @@ import RatingModal from './RatingModal';
 const MovieSearch = () => {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState([]);
+    const [topMovies, setTopMovies] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [selectedMovieId, setSelectedMovieId] = useState(null);
@@ -15,14 +16,31 @@ const MovieSearch = () => {
     const [modalData, setModalData] = useState(null);
     const [isModalLoading, setIsModalLoading] = useState(false);
     const [ratingMovie, setRatingMovie] = useState(null);
+    const [showingTopMovies, setShowingTopMovies] = useState(true);
 
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-    
+
+    const fetchTopMovies = useCallback(async () => {
+        try {
+            const response = await axios.get(`${apiBaseUrl}/get_top_movies.php?limit=10`, { withCredentials: true });
+            setTopMovies(response.data);
+        } catch (error) {
+            console.error("Erreur lors de la récupération des top films:", error);
+            setTopMovies([]);
+        }
+    }, [apiBaseUrl]);
+
+    useEffect(() => {
+        fetchTopMovies();
+    }, [fetchTopMovies]);
+
     const searchMovies = useCallback(async (searchQuery) => {
         if (!searchQuery.trim()) {
             setResults([]);
+            setShowingTopMovies(true);
             return;
         }
+        setShowingTopMovies(false);
         setLoading(true);
         setError('');
         setRatingsData({});
@@ -84,7 +102,11 @@ const MovieSearch = () => {
 
     const handleRatingSuccessFromSearch = () => {
         setRatingMovie(null);
-        searchMovies(query);
+        if (showingTopMovies) {
+            fetchTopMovies();
+        } else {
+            searchMovies(query);
+        }
     };
 
     return (
@@ -104,6 +126,58 @@ const MovieSearch = () => {
                     {loading ? 'Recherche...' : 'Rechercher'}
                 </button>
             </form>
+
+            {showingTopMovies && (
+                <div className="top-movies-section">
+                    <h3 className="section-title">
+                        🏆 Top Films du Rien 
+                        <span className="score-info" title="Score calculé : (note moyenne × nb votes) / (nb votes + 3)">ℹ️</span>
+                    </h3>
+                    {topMovies.length === 0 && <p style={{textAlign: 'center', color: 'var(--text-secondary)'}}>Aucun film trouvé.</p>}
+                    <div className="movie-results">
+                        {topMovies.map((movie, index) => (
+                            <div key={movie.api_movie_id} className="movie-card top-movie-card">
+                                <div className="top-movie-rank">#{index + 1}</div>
+                                <img 
+                                    src={movie.poster_path ? `https://image.tmdb.org/t/p/w200${movie.poster_path}` : '/vite.svg'} 
+                                    alt={movie.title} 
+                                    onClick={() => openMovieDetails(movie.api_movie_id)}
+                                />
+                                <div className="movie-card-info">
+                                    <div className="movie-card-top">
+                                        <h4>{movie.title}</h4>
+                                        <p>{movie.release_date ? movie.release_date.split('-')[0] : 'N/A'}</p>
+                                    </div>
+
+                                    <div className="movie-card-bottom">
+                                        <div className="top-movie-stats">
+                                            <div className="top-movie-rating">
+                                                <span role="img" aria-label="Étoile">⭐</span>
+                                                {movie.average_rating}/10
+                                            </div>
+                                            <div className="top-movie-votes">
+                                                {movie.vote_count} vote{movie.vote_count > 1 ? 's' : ''}
+                                            </div>
+                                            <div className="top-movie-score">
+                                                Score: {movie.popularity_score}
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="movie-card-actions">
+                                            <button className="details-button" onClick={() => openMovieDetails(movie.api_movie_id)}>
+                                                Détails
+                                            </button>
+                                            <button className="rate-icon-button" title="Noter ce film" onClick={() => setRatingMovie(movie)}>
+                                                ⭐
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             <div className="movie-results">
                 {results.map(movie => {

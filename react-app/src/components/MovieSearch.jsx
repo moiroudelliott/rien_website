@@ -63,6 +63,7 @@ const MovieSearch = () => {
                 const ratingsResponse = await axios.get(`${apiBaseUrl}/get_ratings_for_movies.php?ids=${movieIds}`, { withCredentials: true });
                 
                 setRatingsData(ratingsResponse.data);
+            } else {
             }
 
         } catch (err) {
@@ -131,7 +132,7 @@ const MovieSearch = () => {
                 <div className="top-movies-section">
                     <h3 className="section-title">
                         🏆 Top Films du Rien 
-                        <span className="score-info" title="Score calculé : (note moyenne × nb votes) / (nb votes + 3)">ℹ️</span>
+                        <span className="score-info" title="Score calculé : (note moyenne × nb votes) / (nb votes + 0.5)">ℹ️</span>
                     </h3>
                     {topMovies.length === 0 && <p style={{textAlign: 'center', color: 'var(--text-secondary)'}}>Aucun film trouvé.</p>}
                     <div className="movie-results">
@@ -167,7 +168,29 @@ const MovieSearch = () => {
                                             <button className="details-button" onClick={() => openMovieDetails(movie.api_movie_id)}>
                                                 Détails
                                             </button>
-                                            <button className="rate-icon-button" title="Noter ce film" onClick={() => setRatingMovie(movie)}>
+                                            <button className="rate-icon-button" title="Noter ce film" onClick={async () => {
+                                                try {
+                                                    // Récupérer les détails du film avec les infos utilisateur
+                                                    const response = await axios.get(`${apiBaseUrl}/get_movie_details.php?api_movie_id=${movie.api_movie_id}`, { withCredentials: true });
+                                                    const movieDetails = response.data;
+                                                    
+                                                    const enrichedMovie = {
+                                                        ...movie,
+                                                        id: movie.api_movie_id,
+                                                        user_rating: movieDetails.user_rating || 0,
+                                                        user_is_favorite: movieDetails.user_is_favorite || false
+                                                    };
+                                                    setRatingMovie(enrichedMovie);
+                                                } catch (error) {
+                                                    console.error('Erreur lors de la récupération des détails:', error);
+                                                    // Fallback sans préremplissage
+                                                    const fallbackMovie = {
+                                                        ...movie,
+                                                        id: movie.api_movie_id
+                                                    };
+                                                    setRatingMovie(fallbackMovie);
+                                                }
+                                            }}>
                                                 ⭐
                                             </button>
                                         </div>
@@ -182,7 +205,6 @@ const MovieSearch = () => {
             <div className="movie-results">
                 {results.map(movie => {
                     const movieRatings = ratingsData[movie.id];
-                    const hasValidRatings = movieRatings && movieRatings.raters && Array.isArray(movieRatings.raters);
                     
                     return (
                         <div key={movie.id} className="movie-card">
@@ -198,14 +220,14 @@ const MovieSearch = () => {
                                 </div>
 
                                 <div className="movie-card-bottom">
-                                    {hasValidRatings && (
+                                    {movieRatings ? (
                                         <div className="search-ratings-info">
                                             <div className="search-avg-rating">
                                                 <span role="img" aria-label="Étoile">⭐</span>
-                                                {movieRatings.average_rating}
+                                                {movieRatings.average_rating}/10
                                             </div>
                                             <div className="search-raters-avatars">
-                                                {movieRatings.raters.map(rater => (
+                                                {movieRatings.raters && movieRatings.raters.length > 0 && movieRatings.raters.map(rater => (
                                                     <div key={rater.discord_id} className="rater-avatar" title={`${rater.username} a noté ${rater.rating}/10`}>
                                                         <img 
                                                             src={rater.avatar_hash ? `https://cdn.discordapp.com/avatars/${rater.discord_id}/${rater.avatar_hash}.png` : '/vite.svg'}
@@ -215,13 +237,36 @@ const MovieSearch = () => {
                                                 ))}
                                             </div>
                                         </div>
+                                    ) : (
+                                        <div className="no-ratings-info">
+                                            <span style={{fontSize: '0.8rem', color: 'var(--text-secondary)', fontStyle: 'italic'}}>
+                                                Pas encore noté
+                                            </span>
+                                        </div>
                                     )}
                                     
                                     <div className="movie-card-actions">
                                         <button className="details-button" onClick={() => openMovieDetails(movie.id)}>
                                             Détails
                                         </button>
-                                        <button className="rate-icon-button" title="Noter ce film" onClick={() => setRatingMovie(movie)}>
+                                        <button className="rate-icon-button" title="Noter ce film" onClick={async () => {
+                                            try {
+                                                // Récupérer les détails du film avec les infos utilisateur
+                                                const response = await axios.get(`${apiBaseUrl}/get_movie_details.php?api_movie_id=${movie.id}`, { withCredentials: true });
+                                                const movieDetails = response.data;
+                                                
+                                                const enrichedMovie = {
+                                                    ...movie,
+                                                    user_rating: movieDetails.user_rating || 0,
+                                                    user_is_favorite: movieDetails.user_is_favorite || false
+                                                };
+                                                setRatingMovie(enrichedMovie);
+                                            } catch (error) {
+                                                console.error('Erreur lors de la récupération des détails:', error);
+                                                // Fallback sans préremplissage
+                                                setRatingMovie(movie);
+                                            }
+                                        }}>
                                             ⭐
                                         </button>
                                     </div>

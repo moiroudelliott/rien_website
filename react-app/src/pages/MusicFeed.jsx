@@ -56,15 +56,12 @@ const MusicFeed = ({ currentUser }) => {
     };
 
     const toggleLike = async (postId) => {
-        console.log("🔄 Tentative de like/unlike pour le post:", postId);
         try {
             const response = await axios.post(`${apiBaseUrl}/toggle_music_like.php`, 
                 { post_id: postId }, 
                 { withCredentials: true }
             );
-            
-            console.log("✅ Réponse du serveur:", response.data);
-            
+                        
             // Mettre à jour l'état local
             setPosts(posts.map(post => 
                 post.id === postId 
@@ -187,10 +184,11 @@ const MusicFeed = ({ currentUser }) => {
                                                     width="100%"
                                                     height="152"
                                                     frameBorder="0"
-                                                    allowfullscreen=""
-                                                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                                                    allowFullScreen
+                                                    allow="encrypted-media"
                                                     loading="lazy"
                                                     title="Spotify Track"
+                                                    referrerPolicy="strict-origin-when-cross-origin"
                                                 ></iframe>
                                             );
                                         }
@@ -202,13 +200,9 @@ const MusicFeed = ({ currentUser }) => {
                                         if (match) {
                                             const trackId = match[1];
                                             const embedUrl = `https://widget.deezer.com/widget/auto/track/${trackId}`;
-                                            console.log('🎶 Deezer embed:', { url, trackId, embedUrl });
                                             
                                             return (
                                                 <div>
-                                                    <div style={{fontSize: '12px', color: '#666', marginBottom: '5px'}}>
-                                                        Debug Deezer: ID={trackId} | Embed={embedUrl}
-                                                    </div>
                                                     <iframe
                                                         src={embedUrl}
                                                         width="100%"
@@ -216,17 +210,13 @@ const MusicFeed = ({ currentUser }) => {
                                                         frameBorder="0"
                                                         scrolling="no"
                                                         style={{border: 'none'}}
-                                                        allowtransparency="true"
-                                                        allow="encrypted-media"
+                                                        allowTransparency="true"
                                                         loading="lazy"
                                                         title="Deezer Track"
                                                         onError={() => console.error('❌ Erreur iframe Deezer')}
-                                                        onLoad={() => console.log('✅ Iframe Deezer chargée')}
                                                     ></iframe>
                                                 </div>
                                             );
-                                        } else {
-                                            console.log('❌ Pas de match Deezer pour:', url);
                                         }
                                     }
                                     

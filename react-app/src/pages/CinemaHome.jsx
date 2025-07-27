@@ -100,7 +100,6 @@ const CinemaHome = ({ user: currentUser }) => {
                             {userMovies?.length > 0 ? (
                                 userMovies.map(movie => (
                                     <div key={movie.api_movie_id} className="movie-item">
-                                        {/* ... affichage de chaque film ... */}
                                     </div>
                                 ))
                             ) : (

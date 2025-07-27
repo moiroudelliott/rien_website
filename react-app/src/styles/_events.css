@@ -102,4 +102,41 @@
 .create-event-btn:disabled {
     background-color: #555;
     cursor: not-allowed;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .events-container {
+        padding: 1rem;
+    }
+    
+    .page-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+        text-align: center;
+    }
+    
+    .page-title {
+        margin-bottom: 0;
+    }
+    
+    .create-event-btn {
+        width: 100%;
+        padding: 1rem;
+        font-size: 1.1rem;
+    }
+    
+    .events-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .event-card {
+        padding: 1rem;
+    }
+    
+    .events-section-title {
+        font-size: 1.5rem;
+    }
 } 

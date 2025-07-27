@@ -115,7 +115,7 @@
     display: none;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 950px) {
     .navbar-overlay {
         display: block;
         position: fixed;

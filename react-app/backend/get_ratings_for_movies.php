@@ -71,6 +71,8 @@ try {
     }
 
     // Étape 2: Pour chaque film qui a des notes, obtenir les 3 derniers évaluateurs
+    $current_user_discord_id = $_SESSION['discord_id'] ?? null;
+    error_log("Current user discord_id from session: " . ($current_user_discord_id ?? 'NULL'));
     $sql_raters = "
         SELECT 
             m.api_movie_id, 
@@ -78,6 +80,7 @@ try {
             u.username, 
             u.avatar_hash, 
             umr.rating,
+            umr.is_favorite,
             umr.watched_at
         FROM user_movie_ratings umr
         JOIN users u ON umr.user_id = u.id
@@ -92,13 +95,39 @@ try {
 
     $raters_by_movie = [];
     foreach ($all_raters as $rater) {
+        // Ajouter le flag is_current_user
+        $is_current = ($current_user_discord_id && $rater['discord_id'] === $current_user_discord_id);
+        $rater['is_current_user'] = $is_current;
+        error_log("Rater discord_id: " . $rater['discord_id'] . ", Current user: " . ($current_user_discord_id ?? 'NULL') . ", is_current_user: " . ($is_current ? 'true' : 'false'));
         $raters_by_movie[$rater['api_movie_id']][] = $rater;
     }
 
     foreach ($raters_by_movie as $movie_id => $raters) {
         if (isset($results[$movie_id])) {
-            // Garder seulement les 3 plus récents
-            $results[$movie_id]['raters'] = array_slice($raters, 0, 3);
+            // S'assurer que l'utilisateur actuel est inclus s'il a noté le film
+            $current_user_rater = null;
+            $other_raters = [];
+            
+            foreach ($raters as $rater) {
+                if ($rater['is_current_user']) {
+                    $current_user_rater = $rater;
+                } else {
+                    $other_raters[] = $rater;
+                }
+            }
+            
+            // Commencer par l'utilisateur actuel s'il existe, puis ajouter les autres
+            $final_raters = [];
+            if ($current_user_rater) {
+                $final_raters[] = $current_user_rater;
+                // Ajouter jusqu'à 2 autres utilisateurs pour faire un total de 3
+                $final_raters = array_merge($final_raters, array_slice($other_raters, 0, 2));
+            } else {
+                // Si pas d'utilisateur actuel, prendre les 3 premiers
+                $final_raters = array_slice($other_raters, 0, 3);
+            }
+            
+            $results[$movie_id]['raters'] = $final_raters;
         }
     }
 
@@ -108,6 +137,8 @@ try {
     exit;
 }
 
+// Debug log
+error_log("get_ratings_for_movies results: " . json_encode($results));
 echo json_encode($results);
 
 ?> 

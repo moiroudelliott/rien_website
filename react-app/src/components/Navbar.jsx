@@ -5,6 +5,7 @@ import usersIcon from '/users.svg';
 import cinemaIcon from '/clapperboard.svg';
 import mapIcon from '/map.svg';
 import eventIcon from '/event.svg';
+import musicIcon from '/music.svg';
 import { useLocation } from 'react-router-dom';
 
 const Navbar = ({ onLogout }) => {
@@ -44,6 +45,10 @@ const Navbar = ({ onLogout }) => {
                         <NavLink to="/events" className="nav-link" onClick={closeMenu}>
                             <img src={eventIcon} alt="Événements" className="nav-icon" />
                             Événements
+                        </NavLink>
+                        <NavLink to="/music" className="nav-link" onClick={closeMenu}>
+                            <img src={musicIcon} alt="Musique" className="nav-icon" />
+                            Musique
                         </NavLink>
                         <div className="navbar-actions-mobile">
                              <button onClick={() => { closeMenu(); onLogout(); }} className="logout-button">

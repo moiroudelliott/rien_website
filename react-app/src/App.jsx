@@ -13,6 +13,7 @@ import MapPage from './pages/MapPage';
 import UserList from './pages/UserList';
 import CinemaHome from './pages/CinemaHome';
 import EventsPage from './pages/EventsPage';
+import MusicFeed from './pages/MusicFeed';
 
 // Import des composants
 import ProfileCompletion from './components/ProfileCompletion';
@@ -86,6 +87,8 @@ function App() {
       setTheme('theme-users');
     } else if (path.includes('/events')) {
       setTheme('theme-events');
+    } else if (path.includes('/music')) {
+      setTheme('theme-music');
     } else if (path.includes('/home')) {
         setTheme('theme-home');
     } else {
@@ -163,6 +166,7 @@ function App() {
           <Route path="/cinema" element={<CinemaHome user={currentUser} />} />
           <Route path="/users" element={<UserList currentUser={currentUser} />} />
           <Route path="/events" element={<EventsPage currentUser={currentUser} />} />
+          <Route path="/music" element={<MusicFeed currentUser={currentUser} />} />
           <Route 
             path="/map" 
             element={<MapPage currentUser={currentUser} onProfileUpdated={handleProfileUpdated} />} 

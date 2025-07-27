@@ -35,6 +35,11 @@
   --glow-white: rgba(255, 255, 255, 0.7);
   --bg-white-transparent: rgba(255, 255, 255, 0.2);
 
+  /* Palette Verte (pour la musique) */
+  --led-green: #1DB954;
+  --glow-green: rgba(29, 185, 84, 0.7);
+  --bg-green-transparent: rgba(29, 185, 84, 0.2);
+
   --accent-pink: #ff3d8b;
   --glow-accent: rgba(255, 61, 139, 0.7);
   --text-main: #e8eaf6;

@@ -1,0 +1,240 @@
+/* Thème musique global */
+.theme-music {
+    --primary-led: var(--led-green);
+    --glow-primary: var(--glow-green);
+    --glow-primary-faded: rgba(29, 185, 84, 0.3);
+    --bg-primary-transparent: var(--bg-green-transparent);
+}
+
+.music-feed-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.music-feed-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.music-feed-header h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-main);
+}
+
+.music-feed-header p {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+}
+
+/* Formulaire de nouveau post */
+.new-post-form {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.text-input, .url-input {
+    width: 100%;
+    padding: 0.8rem;
+    background: var(--bg-dark);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-main);
+    font-size: 1rem;
+    resize: vertical;
+}
+
+.text-input:focus, .url-input:focus {
+    outline: none;
+    border-color: var(--primary-led);
+    box-shadow: 0 0 10px var(--glow-primary-faded);
+}
+
+.submit-button {
+    background: linear-gradient(145deg, var(--primary-led), var(--accent-pink));
+    border: none;
+    border-radius: 8px;
+    color: white;
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.submit-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 165, 0, 0.4);
+}
+
+.submit-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Feed des posts */
+.posts-feed {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.no-posts {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+/* Post individuel */
+.music-post {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.2s ease;
+}
+
+.music-post:hover {
+    border-color: var(--primary-led);
+    box-shadow: 0 4px 15px var(--glow-primary-faded);
+}
+
+.post-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 0.8rem;
+    border: 2px solid var(--border-color);
+}
+
+.post-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.username {
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 0.2rem;
+}
+
+.timestamp {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.post-text {
+    margin-bottom: 1rem;
+    color: var(--text-main);
+    line-height: 1.5;
+    white-space: pre-wrap;
+}
+
+/* Embed Musique (Spotify/Deezer) */
+.music-embed {
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.music-link {
+    display: block;
+    color: white;
+    text-decoration: none;
+    padding: 1rem;
+    text-align: center;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: background 0.2s ease;
+}
+
+/* Styles spécifiques selon la plateforme */
+.music-link[href*="spotify.com"] {
+    background: #1DB954;
+}
+
+.music-link[href*="spotify.com"]:hover {
+    background: #1ed760;
+}
+
+.music-link[href*="deezer.com"] {
+    background: #FF5500;
+}
+
+.music-link[href*="deezer.com"]:hover {
+    background: #ff6a1a;
+}
+
+/* Fallback pour autres plateformes */
+.music-link:not([href*="spotify.com"]):not([href*="deezer.com"]) {
+    background: var(--primary-led);
+}
+
+.music-link:not([href*="spotify.com"]):not([href*="deezer.com"]):hover {
+    background: var(--accent-pink);
+}
+
+/* Actions du post */
+.post-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.like-button {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 0.5rem 1rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+}
+
+.like-button:hover {
+    border-color: #ff4757;
+    color: #ff4757;
+}
+
+.like-button.liked {
+    background: #ff4757;
+    border-color: #ff4757;
+    color: white;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .music-feed-container {
+        padding: 0.5rem;
+    }
+    
+    .music-feed-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .new-post-form, .music-post {
+        padding: 1rem;
+    }
+    
+    .user-avatar {
+        width: 35px;
+        height: 35px;
+    }
+}
